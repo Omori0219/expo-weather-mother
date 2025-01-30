@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { RootStackParamList } from './src/types/navigation';
 import { SplashScreen } from './src/screens/SplashScreen';
 import { SetupScreen } from './src/screens/SetupScreen';
+import { WeatherScreen } from './src/screens/WeatherScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -20,6 +21,7 @@ export default function App() {
       >
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Setup" component={SetupScreen} />
+        <Stack.Screen name="Weather" component={WeatherScreen} />
         {/* 他の画面は後で実装 */}
         {/* <Stack.Screen name="Main" component={MainScreen} /> */}
       </Stack.Navigator>
