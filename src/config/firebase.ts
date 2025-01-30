@@ -1,18 +1,20 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import Constants from "expo-constants";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 // Firebase設定オブジェクト
 const firebaseConfig = {
-  apiKey: Constants.expoConfig?.extra?.firebaseApiKey,
-  authDomain: Constants.expoConfig?.extra?.firebaseAuthDomain,
-  projectId: Constants.expoConfig?.extra?.firebaseProjectId,
-  storageBucket: Constants.expoConfig?.extra?.firebaseStorageBucket,
-  messagingSenderId: Constants.expoConfig?.extra?.firebaseMessagingSenderId,
-  appId: Constants.expoConfig?.extra?.firebaseAppId,
-  measurementId: Constants.expoConfig?.extra?.firebaseMeasurementId,
+  apiKey: 'AIzaSyAUnl5SglXDITLeRzm7NBvaOKCEC6Xw64c',
+  authDomain: 'caen-weathermother-prod.firebaseapp.com',
+  projectId: 'caen-weathermother-prod',
+  storageBucket: 'caen-weathermother-prod.firebasestorage.app',
+  messagingSenderId: '179164196124',
+  appId: '1:179164196124:web:b96803f0cd3b21f61eded9',
+  measurementId: 'G-9CY1YFBV4Y',
 };
+
+// 設定値の確認用ログ
+console.log('Firebase Config:', firebaseConfig);
 
 // Firebaseの初期化
 export const app = initializeApp(firebaseConfig);
