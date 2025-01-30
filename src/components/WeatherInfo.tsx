@@ -1,13 +1,20 @@
-import { StyleSheet, View, Text, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, RefreshControl } from 'react-native';
 import type { WeatherData } from '../hooks/useWeather';
 import { AREAS } from '../constants/areas';
 
 interface WeatherInfoProps {
   weatherData: WeatherData;
   areaCode: string;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
-export function WeatherInfo({ weatherData, areaCode }: WeatherInfoProps) {
+export function WeatherInfo({
+  weatherData,
+  areaCode,
+  onRefresh,
+  isRefreshing = false,
+}: WeatherInfoProps) {
   const area = AREAS.find(a => a.areaCode === areaCode);
   const formattedDate = new Date(weatherData.reportDatetime).toLocaleString('ja-JP', {
     year: 'numeric',
@@ -18,7 +25,19 @@ export function WeatherInfo({ weatherData, areaCode }: WeatherInfoProps) {
   });
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={onRefresh}
+          colors={['#007AFF']}
+          tintColor="#007AFF"
+          title="天気情報を更新中..."
+          titleColor="#666"
+        />
+      }
+    >
       <View style={styles.header}>
         <Text style={styles.areaName}>{area?.areaName || '不明な地域'}</Text>
         <Text style={styles.date}>{formattedDate} 発表</Text>
