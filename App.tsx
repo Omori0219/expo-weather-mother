@@ -1,29 +1,18 @@
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text } from 'react-native';
-import { useAuth } from './src/hooks/useAuth';
+import { StyleSheet, View } from 'react-native';
+import { app } from './src/config/firebase';
 
 export default function App() {
-  const { user, loading, signInAnonymouslyAsync } = useAuth();
-
   useEffect(() => {
-    // アプリ起動時に匿名サインインを試みる
-    if (!loading && !user) {
-      signInAnonymouslyAsync().catch(console.error);
+    // Firebaseの初期化を確認
+    if (app) {
+      console.log('Firebase initialized successfully');
     }
-  }, [loading, user]);
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
+  }, []);
 
   return (
     <View style={styles.container}>
-      <Text>{user ? `Signed in as: ${user.uid}` : 'Not signed in'}</Text>
       <StatusBar style="auto" />
     </View>
   );
