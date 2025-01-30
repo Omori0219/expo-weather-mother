@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { AreaSelector } from '../components/AreaSelector';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { useUserData } from '../hooks/useUserData';
 import type { AreaData } from '../types/user';
+import type { RootStackNavigationProp } from '../types/navigation';
 
 export function SetupScreen() {
+  const navigation = useNavigation<RootStackNavigationProp>();
   const [selectedArea, setSelectedArea] = useState<AreaData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +45,10 @@ export function SetupScreen() {
     }
   };
 
+  const handleNext = () => {
+    navigation.replace('Weather');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <LoadingOverlay visible={isLoading} message="読み込み中..." />
@@ -57,7 +64,7 @@ export function SetupScreen() {
               selectedAreaCode={selectedArea?.areaCode || userData?.areaCode}
             />
             {(selectedArea || userData?.areaCode) && (
-              <TouchableOpacity style={styles.nextButton}>
+              <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
                 <Text style={styles.nextButtonText}>次へ</Text>
               </TouchableOpacity>
             )}
