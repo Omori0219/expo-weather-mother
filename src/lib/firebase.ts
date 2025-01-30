@@ -1,8 +1,6 @@
-import { initializeApp, getApps } from 'firebase/app';
-import { getAuth, browserLocalPersistence, setPersistence } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
-// Firebase設定
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -12,14 +10,5 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-// アプリケーションの初期化（一度だけ実行）
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
-
-// Firestoreの初期化
+const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
-
-// 認証の初期化
-export const auth = getAuth(app);
-
-// 認証の永続化設定
-setPersistence(auth, browserLocalPersistence);
