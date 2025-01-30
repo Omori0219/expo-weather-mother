@@ -10,6 +10,7 @@ export function useUserData() {
   const loadUserData = useCallback(async () => {
     try {
       const jsonValue = await AsyncStorage.getItem(USER_DATA_KEY);
+      console.log('📝 Loading user data:', jsonValue);
       if (jsonValue != null) {
         const data = JSON.parse(jsonValue);
         setUserData(data);
@@ -34,6 +35,7 @@ export function useUserData() {
         };
 
         await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(newData));
+        console.log('📝 Saved user data:', newData);
         setUserData(newData);
         return true;
       } catch (error) {
