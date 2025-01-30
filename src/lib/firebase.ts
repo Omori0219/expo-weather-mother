@@ -1,7 +1,9 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps } from 'firebase/app';
+import { getAuth, initializeAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Firebase設定
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -11,6 +13,11 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+// アプリケーションの初期化（一度だけ実行）
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+
+// Firestoreの初期化
 export const db = getFirestore(app);
+
+// 認証の初期化
 export const auth = getAuth(app);
