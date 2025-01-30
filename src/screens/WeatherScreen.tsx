@@ -5,6 +5,7 @@ import { WeatherInfo } from '../components/WeatherInfo';
 import { useUserData } from '../hooks/useUserData';
 import { useWeather } from '../hooks/useWeather';
 import { useState, useEffect, useCallback } from 'react';
+import { AREAS } from '../constants/areas';
 
 export function WeatherScreen() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -44,20 +45,14 @@ export function WeatherScreen() {
   }, []);
 
   const isLoading = isInitialLoading || (isWeatherLoading && !isRefreshing);
-
-  if (error) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <ErrorMessage message={error} onRetry={loadWeatherData} />
-      </SafeAreaView>
-    );
-  }
+  const area = userData?.areaCode ? AREAS.find(a => a.areaCode === userData.areaCode) : null;
 
   if (!userData?.areaCode) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.content}>
           <Text style={styles.placeholder}>地域が設定されていません</Text>
+          <Text style={styles.subText}>設定画面から地域を選択してください</Text>
         </View>
       </SafeAreaView>
     );
@@ -65,9 +60,14 @@ export function WeatherScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <LoadingOverlay visible={isLoading} message="天気情報を取得中..." />
+      <LoadingOverlay
+        visible={isLoading}
+        message={`${area?.areaName || ''}の天気情報を取得中...`}
+      />
       <View style={styles.content}>
-        {weatherData ? (
+        {error ? (
+          <ErrorMessage message={error} onRetry={loadWeatherData} />
+        ) : weatherData ? (
           <WeatherInfo
             weatherData={weatherData}
             areaCode={userData.areaCode}
@@ -75,7 +75,7 @@ export function WeatherScreen() {
             isRefreshing={isRefreshing}
           />
         ) : (
-          <Text style={styles.placeholder}>天気情報を取得できませんでした</Text>
+          !isLoading && <Text style={styles.placeholder}>天気情報を取得できませんでした</Text>
         )}
       </View>
     </SafeAreaView>
@@ -94,6 +94,12 @@ const styles = StyleSheet.create({
   placeholder: {
     fontSize: 18,
     color: '#666',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subText: {
+    fontSize: 14,
+    color: '#999',
     textAlign: 'center',
   },
 });
