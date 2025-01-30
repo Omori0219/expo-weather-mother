@@ -1,14 +1,20 @@
-import { useState } from 'react';
-import { StyleSheet, View, Text, SafeAreaView } from 'react-native';
+import { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
 import { AreaSelector } from '../components/AreaSelector';
+import { useUserData } from '../hooks/useUserData';
 import type { AreaData } from '../types/user';
 
 export function SetupScreen() {
   const [selectedArea, setSelectedArea] = useState<AreaData | null>(null);
+  const { userData, loadUserData, saveUserData } = useUserData();
 
-  const handleAreaSelect = (area: AreaData) => {
+  useEffect(() => {
+    loadUserData();
+  }, [loadUserData]);
+
+  const handleAreaSelect = async (area: AreaData) => {
     setSelectedArea(area);
-    // TODO: 選択された地域を保存する処理を実装
+    await saveUserData({ areaCode: area.areaCode });
   };
 
   return (
@@ -16,7 +22,15 @@ export function SetupScreen() {
       <View style={styles.content}>
         <Text style={styles.title}>お住まいの地域を選択してください</Text>
         <Text style={styles.subtitle}>選択した地域の天気予報をお届けします</Text>
-        <AreaSelector onSelect={handleAreaSelect} selectedAreaCode={selectedArea?.areaCode} />
+        <AreaSelector
+          onSelect={handleAreaSelect}
+          selectedAreaCode={selectedArea?.areaCode || userData?.areaCode}
+        />
+        {(selectedArea || userData?.areaCode) && (
+          <TouchableOpacity style={styles.nextButton}>
+            <Text style={styles.nextButtonText}>次へ</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -42,5 +56,18 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginBottom: 24,
+  },
+  nextButton: {
+    backgroundColor: '#007AFF',
+    padding: 16,
+    borderRadius: 8,
+    marginTop: 24,
+    marginHorizontal: 16,
+  },
+  nextButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
