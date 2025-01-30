@@ -1,12 +1,7 @@
 import { useState, useCallback } from 'react';
-
-export interface WeatherData {
-  publishingOffice: string;
-  reportDatetime: string;
-  targetArea: string;
-  headlineText: string;
-  text: string;
-}
+import { collection, doc, getDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import type { WeatherDocument, WeatherData } from '../types/weather';
 
 export function useWeather() {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,20 +13,32 @@ export function useWeather() {
       setIsLoading(true);
       setError(null);
 
-      // 気象庁APIのエンドポイント
-      const response = await fetch(
-        `https://www.jma.go.jp/bosai/forecast/data/overview_forecast/${areaCode}.json`
-      );
+      // 今日の日付をYYYYMMDD形式で取得
+      const today = new Date();
+      const dateString = today.toISOString().slice(0, 10).replace(/-/g, '');
 
-      if (!response.ok) {
-        throw new Error('天気情報の取得に失敗しました');
+      // ドキュメントIDを生成
+      const docId = `${dateString}-${areaCode}`;
+
+      // Firestoreからデータを取得
+      const docRef = doc(collection(db, 'weather_data'), docId);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        throw new Error('本日の天気情報がまだ準備できていません');
       }
 
-      const data = await response.json();
-      setWeatherData(data);
+      const data = docSnap.data() as WeatherDocument;
+
+      setWeatherData({
+        message: data.generatedMessage,
+        date: dateString,
+      });
+
       return data;
     } catch (err) {
-      setError('天気情報の取得に失敗しました');
+      const errorMessage = err instanceof Error ? err.message : '天気情報の取得に失敗しました';
+      setError(errorMessage);
       return null;
     } finally {
       setIsLoading(false);
