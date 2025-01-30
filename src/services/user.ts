@@ -23,21 +23,21 @@ export async function createUserDocument(userId: string): Promise<void> {
   }
 }
 
-export async function updateUserPrefecture(userId: string, prefecture: string): Promise<void> {
+export async function updateUserArea(userId: string, areaCode: string): Promise<void> {
   const userRef = doc(db, 'users', userId);
 
   try {
     await setDoc(
       userRef,
       {
-        prefecture,
+        areaCode,
         updatedAt: new Date(),
       },
       { merge: true }
     );
-    console.log('Prefecture updated successfully');
+    console.log('Area code updated successfully');
   } catch (error) {
-    console.error('Error updating prefecture:', error);
+    console.error('Error updating area code:', error);
     throw error;
   }
 }
