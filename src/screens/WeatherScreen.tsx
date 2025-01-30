@@ -1,40 +1,62 @@
-import { StyleSheet, View, Text, SafeAreaView } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, RefreshControl } from 'react-native';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { ErrorMessage } from '../components/ErrorMessage';
+import { WeatherInfo } from '../components/WeatherInfo';
 import { useUserData } from '../hooks/useUserData';
-import { useState, useEffect } from 'react';
+import { useWeather } from '../hooks/useWeather';
+import { useState, useEffect, useCallback } from 'react';
 
 export function WeatherScreen() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { userData, loadUserData } = useUserData();
+  const { isLoading: isWeatherLoading, error, weatherData, fetchWeather } = useWeather();
+
+  const loadWeatherData = useCallback(async () => {
+    if (userData?.areaCode) {
+      await fetchWeather(userData.areaCode);
+    }
+  }, [userData?.areaCode, fetchWeather]);
+
+  const loadInitialData = async () => {
+    try {
+      setIsInitialLoading(true);
+      const user = await loadUserData();
+      if (user?.areaCode) {
+        await fetchWeather(user.areaCode);
+      }
+    } finally {
+      setIsInitialLoading(false);
+    }
+  };
+
+  const handleRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      await loadWeatherData();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     loadInitialData();
   }, []);
 
-  const loadInitialData = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      await loadUserData();
-    } catch (err) {
-      setError('データの読み込みに失敗しました');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const isLoading = isInitialLoading || (isWeatherLoading && !isRefreshing);
 
   return (
     <SafeAreaView style={styles.container}>
-      <LoadingOverlay visible={isLoading} message="読み込み中..." />
+      <LoadingOverlay visible={isLoading} message="天気情報を取得中..." />
       <View style={styles.content}>
         {error ? (
-          <ErrorMessage message={error} onRetry={loadInitialData} />
+          <ErrorMessage message={error} onRetry={loadWeatherData} />
+        ) : !userData?.areaCode ? (
+          <Text style={styles.placeholder}>地域が設定されていません</Text>
+        ) : !weatherData ? (
+          <Text style={styles.placeholder}>天気情報を取得できませんでした</Text>
         ) : (
-          <Text style={styles.placeholder}>
-            {userData?.areaCode ? `${userData.areaCode}の天気情報` : '地域が設定されていません'}
-          </Text>
+          <WeatherInfo weatherData={weatherData} areaCode={userData.areaCode} />
         )}
       </View>
     </SafeAreaView>
@@ -49,12 +71,10 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   placeholder: {
     fontSize: 18,
-    color: '#333',
+    color: '#666',
     textAlign: 'center',
   },
 });
