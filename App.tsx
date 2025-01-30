@@ -1,51 +1,27 @@
-import { useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
-import { useAuth } from './src/hooks/useAuth';
+import { RootStackParamList } from './src/types/navigation';
+import { SplashScreen } from './src/screens/SplashScreen';
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
-  const { user, loading, error, signInAnonymously } = useAuth();
-
-  useEffect(() => {
-    // アプリ起動時に匿名認証を実行
-    if (!user && !loading && !error) {
-      console.log('Attempting anonymous sign in...');
-      signInAnonymously().catch(e => {
-        console.error('Sign in error:', e);
-      });
-    }
-  }, [user, loading, error, signInAnonymously]);
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
-  if (error) {
-    console.error('Auth error:', error);
-    return (
-      <View style={styles.container}>
-        <Text>エラーが発生しました: {error.message}</Text>
-      </View>
-    );
-  }
-
   return (
-    <View style={styles.container}>
-      <Text>ユーザーID: {user?.uid}</Text>
+    <NavigationContainer>
       <StatusBar style="auto" />
-    </View>
+      <Stack.Navigator
+        initialRouteName="Splash"
+        screenOptions={{
+          headerShown: false,
+          animation: 'fade',
+        }}
+      >
+        <Stack.Screen name="Splash" component={SplashScreen} />
+        {/* 他の画面は後で実装 */}
+        {/* <Stack.Screen name="Setup" component={SetupScreen} /> */}
+        {/* <Stack.Screen name="Main" component={MainScreen} /> */}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

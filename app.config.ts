@@ -1,29 +1,29 @@
-import { ExpoConfig, ConfigContext } from "expo/config";
+import { ExpoConfig, ConfigContext } from 'expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: "お天気おかん",
-  slug: "weathermother",
-  version: "1.0.0",
-  orientation: "portrait",
-  icon: "./assets/icon.png",
-  userInterfaceStyle: "light",
+  name: 'お天気おかん',
+  slug: 'weathermother',
+  version: '1.0.0',
+  orientation: 'portrait',
+  icon: './assets/icon.png',
+  userInterfaceStyle: 'light',
   splash: {
-    image: "./assets/splash.png",
-    resizeMode: "contain",
-    backgroundColor: "#ffffff",
+    image: './assets/splash.png',
+    resizeMode: 'contain',
+    backgroundColor: '#ffffff',
   },
-  assetBundlePatterns: ["**/*"],
+  assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: "com.caen.weathermother",
+    bundleIdentifier: 'com.caen.weathermother',
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: "./assets/adaptive-icon.png",
-      backgroundColor: "#ffffff",
+      foregroundImage: './assets/adaptive-icon.png',
+      backgroundColor: '#ffffff',
     },
-    package: "com.caen.weathermother",
+    package: 'com.caen.weathermother',
   },
   extra: {
     firebaseApiKey: process.env.FIREBASE_API_KEY,
@@ -34,8 +34,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     firebaseAppId: process.env.FIREBASE_APP_ID,
     firebaseMeasurementId: process.env.FIREBASE_MEASUREMENT_ID,
     eas: {
-      projectId: "your-project-id",
+      projectId: 'your-project-id',
     },
   },
-  plugins: ["expo-notifications"],
+  plugins: ['expo-notifications'],
 });

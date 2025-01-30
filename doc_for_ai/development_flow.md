@@ -3,7 +3,7 @@
 ## 1. 初期設定とプロジェクト構造の確立
 ### feat: 🎉 #1 プロジェクトの初期設定
 - [x] Expoプロジェクトの作成（`npx create-expo-app@latest --template blank-typescript .`）
-- [ ] 必要なディレクトリ構造の作成
+- [x] 必要なディレクトリ構造の作成
   ```
   src/
   ├── components/     # 共通コンポーネント
@@ -15,73 +15,51 @@
   ├── utils/          # ユーティリティ関数
   └── constants/      # 定数
   ```
-- [ ] .gitignoreの設定
-- [ ] ESLintとPrettierの設定
-- [ ] app.jsonの基本設定
+- [x] .gitignoreの設定
+- [x] ESLintとPrettierの設定
+- [x] app.jsonの基本設定
   - アプリ名、バージョン、パーミッション等の設定
 
 ### feat: 📦 #2 必要なパッケージのインストール
-- [ ] Navigationパッケージのインストール
+- [x] Navigationパッケージのインストール
   ```bash
   npm install @react-navigation/native @react-navigation/native-stack
   npx expo install react-native-screens react-native-safe-area-context
   ```
-- [ ] Firebaseパッケージのインストール（Expo Managed Workflow用）
+- [x] Firebaseパッケージのインストール（Expo Managed Workflow用）
   ```bash
   npx expo install firebase
   ```
-- [ ] その他の必要なパッケージのインストール
+- [x] その他の必要なパッケージのインストール
   ```bash
-  npx expo install expo-notifications expo-device expo-constants
-  npx expo install expo-updates
+  npx expo install expo-notifications expo-device expo-constants expo-updates
   ```
 
 ### feat: 🔧 #3 Firebase設定の実装
-- [ ] Firebase設定ファイルの作成
+- [x] Firebase設定ファイルの作成
   - `src/config/firebase.ts`にFirebase構成オブジェクトを記述
-  ```typescript
-  // src/config/firebase.ts
-  import { initializeApp } from 'firebase/app';
-  import { getAuth } from 'firebase/auth';
-  import { getFirestore } from 'firebase/firestore';
-  
-  const firebaseConfig = {
-    // Firebase構成オブジェクト
-  };
-  
-  export const app = initializeApp(firebaseConfig);
-  export const auth = getAuth(app);
-  export const db = getFirestore(app);
-  ```
-- [ ] 環境変数の設定
-  - `.env`ファイルの作成（.gitignoreに追加）
+- [x] 環境変数の設定
+  - `.env`ファイルの作成
   - `app.config.ts`での環境変数の読み込み設定
-  ```typescript
-  // app.config.ts
-  export default {
-    expo: {
-      extra: {
-        firebaseApiKey: process.env.FIREBASE_API_KEY,
-        // その他の環境変数
-      },
-    },
-  };
-  ```
-- [ ] Firebaseの初期化処理の実装
+- [x] Firebaseの初期化処理の実装
   - App.tsxでのFirebase初期化
 
 ## 2. 認証フローの実装
 ### feat: 🔐 #4 匿名認証の実装
-- [ ] 認証カスタムフックの作成（`src/hooks/useAuth.ts`）
+- [x] 認証カスタムフックの作成（`src/hooks/useAuth.ts`）
   - 匿名サインイン関数
   - サインアウト関数
   - 認証状態の監視
-- [ ] 認証状態の管理実装
+- [x] 認証状態の管理実装
   - ユーザーのログイン状態（isAuthenticated）
   - ユーザーID（uid）
   - ローディング状態
-- [ ] 匿名サインインロジックの実装
+- [x] 匿名サインインロジックの実装
   - アプリ起動時の自動サインイン
+- [x] Firestoreユーザードキュメントの作成
+  - ユーザー情報の型定義
+  - Firestore操作用サービスの実装
+  - 認証後の自動ドキュメント作成
 
 ## 3. 画面実装
 ### feat: 💫 #5 スプラッシュ画面の実装
