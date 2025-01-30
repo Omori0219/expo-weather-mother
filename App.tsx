@@ -9,7 +9,10 @@ export default function App() {
   useEffect(() => {
     // アプリ起動時に匿名認証を実行
     if (!user && !loading && !error) {
-      signInAnonymously();
+      console.log('Attempting anonymous sign in...');
+      signInAnonymously().catch(e => {
+        console.error('Sign in error:', e);
+      });
     }
   }, [user, loading, error, signInAnonymously]);
 
@@ -22,6 +25,7 @@ export default function App() {
   }
 
   if (error) {
+    console.error('Auth error:', error);
     return (
       <View style={styles.container}>
         <Text>エラーが発生しました: {error.message}</Text>
