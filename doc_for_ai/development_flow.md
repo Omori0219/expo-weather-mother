@@ -4,9 +4,21 @@
 ### feat: 🎉 #1 プロジェクトの初期設定
 - [x] Expoプロジェクトの作成（`npx create-expo-app@latest --template blank-typescript .`）
 - [ ] 必要なディレクトリ構造の作成
+  ```
+  src/
+  ├── components/     # 共通コンポーネント
+  ├── screens/        # 画面コンポーネント
+  ├── hooks/          # カスタムフック
+  ├── services/       # Firebase等の外部サービス
+  ├── config/         # 設定ファイル
+  ├── types/          # 型定義
+  ├── utils/          # ユーティリティ関数
+  └── constants/      # 定数
+  ```
 - [ ] .gitignoreの設定
 - [ ] ESLintとPrettierの設定
 - [ ] app.jsonの基本設定
+  - アプリ名、バージョン、パーミッション等の設定
 
 ### feat: 📦 #2 必要なパッケージのインストール
 - [ ] Navigationパッケージのインストール
@@ -14,25 +26,62 @@
   npm install @react-navigation/native @react-navigation/native-stack
   npx expo install react-native-screens react-native-safe-area-context
   ```
-- [ ] Firebaseパッケージのインストール
+- [ ] Firebaseパッケージのインストール（Expo Managed Workflow用）
   ```bash
-  npx expo install @react-native-firebase/app @react-native-firebase/auth @react-native-firebase/firestore
+  npx expo install firebase
   ```
 - [ ] その他の必要なパッケージのインストール
   ```bash
   npx expo install expo-notifications expo-device expo-constants
+  npx expo install expo-updates
   ```
 
 ### feat: 🔧 #3 Firebase設定の実装
 - [ ] Firebase設定ファイルの作成
+  - `src/config/firebase.ts`にFirebase構成オブジェクトを記述
+  ```typescript
+  // src/config/firebase.ts
+  import { initializeApp } from 'firebase/app';
+  import { getAuth } from 'firebase/auth';
+  import { getFirestore } from 'firebase/firestore';
+  
+  const firebaseConfig = {
+    // Firebase構成オブジェクト
+  };
+  
+  export const app = initializeApp(firebaseConfig);
+  export const auth = getAuth(app);
+  export const db = getFirestore(app);
+  ```
 - [ ] 環境変数の設定
+  - `.env`ファイルの作成（.gitignoreに追加）
+  - `app.config.ts`での環境変数の読み込み設定
+  ```typescript
+  // app.config.ts
+  export default {
+    expo: {
+      extra: {
+        firebaseApiKey: process.env.FIREBASE_API_KEY,
+        // その他の環境変数
+      },
+    },
+  };
+  ```
 - [ ] Firebaseの初期化処理の実装
+  - App.tsxでのFirebase初期化
 
 ## 2. 認証フローの実装
 ### feat: 🔐 #4 匿名認証の実装
-- [ ] 認証カスタムフックの作成
+- [ ] 認証カスタムフックの作成（`src/hooks/useAuth.ts`）
+  - 匿名サインイン関数
+  - サインアウト関数
+  - 認証状態の監視
 - [ ] 認証状態の管理実装
+  - ユーザーのログイン状態（isAuthenticated）
+  - ユーザーID（uid）
+  - ローディング状態
 - [ ] 匿名サインインロジックの実装
+  - アプリ起動時の自動サインイン
 
 ## 3. 画面実装
 ### feat: 💫 #5 スプラッシュ画面の実装
@@ -42,13 +91,39 @@
 
 ### feat: 🎨 #6 初期設定画面の実装
 - [ ] 都道府県選択コンポーネントの作成
-- [ ] 都道府県データの定義
+- [ ] 都道府県データの定義（`src/constants/prefectures.ts`）
+  ```typescript
+  export const prefectures = [
+    { id: 'hokkaido', name: '北海道', areaCode: '010000' },
+    // ... その他の都道府県
+  ] as const;
+  ```
 - [ ] Firestoreへの保存処理の実装
+  - ユーザードキュメントの作成（`users/${uid}`）
+  - 都道府県情報の保存
 - [ ] バリデーションの実装
 
 ### feat: 📱 #7 メイン画面の実装
 - [ ] 天気情報表示コンポーネントの作成
+  - お天気おかんメッセージの表示
+  - 更新日時の表示
+  - エラー時の代替表示
 - [ ] Firestoreからのデータ取得処理の実装
+  ```typescript
+  // 天気情報の型定義
+  interface WeatherData {
+    mother_message: string;
+    created_at: string;
+    area_code: string;
+  }
+  
+  // データ取得処理
+  const fetchWeatherData = async (areaCode: string) => {
+    const today = format(new Date(), 'yyyyMMdd');
+    const docId = `${today}-${areaCode}`;
+    // Firestoreからデータを取得
+  };
+  ```
 - [ ] エラー表示の実装
 - [ ] ローディング表示の実装
 
