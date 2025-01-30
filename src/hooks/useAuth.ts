@@ -6,6 +6,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { AuthState, UseAuth } from '../types/auth';
+import { createUserDocument } from '../services/user';
 
 export function useAuth(): UseAuth {
   const [state, setState] = useState<AuthState>({
@@ -17,8 +18,15 @@ export function useAuth(): UseAuth {
   useEffect(() => {
     // 認証状態の監視
     const unsubscribe = auth.onAuthStateChanged(
-      user => {
+      async user => {
         setState(prev => ({ ...prev, user, loading: false }));
+        if (user) {
+          try {
+            await createUserDocument(user.uid);
+          } catch (error) {
+            console.error('Error creating user document:', error);
+          }
+        }
       },
       error => {
         setState(prev => ({ ...prev, error: error as Error, loading: false }));
