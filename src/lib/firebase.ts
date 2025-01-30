@@ -1,7 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getAuth, initializeAuth } from 'firebase/auth';
+import { getAuth, browserLocalPersistence, setPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Firebase設定
 const firebaseConfig = {
@@ -21,3 +20,6 @@ export const db = getFirestore(app);
 
 // 認証の初期化
 export const auth = getAuth(app);
+
+// 認証の永続化設定
+setPersistence(auth, browserLocalPersistence);
