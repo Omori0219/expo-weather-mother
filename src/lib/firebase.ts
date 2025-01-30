@@ -1,4 +1,4 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
@@ -11,11 +11,6 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-// アプリが既に初期化されている場合は既存のインスタンスを使用
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-
-// Firestore
+const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
-
-// Auth
 export const auth = getAuth(app);
