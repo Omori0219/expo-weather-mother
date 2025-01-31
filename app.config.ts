@@ -58,7 +58,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     firebaseMessagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
     firebaseAppId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
     firebaseMeasurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
-    easProjectId: process.env.EXPO_PUBLIC_EAS_PROJECT_ID,
+    easProjectId: '612673a9-02e8-484d-a578-ce3c0f94ddcf',
     eas: {
       projectId: '612673a9-02e8-484d-a578-ce3c0f94ddcf',
     },
