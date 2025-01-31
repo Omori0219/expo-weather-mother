@@ -4,7 +4,7 @@ import {
   signInAnonymously as firebaseSignInAnonymously,
   signOut as firebaseSignOut,
 } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { auth } from '../lib/firebase';
 import { AuthState, UseAuth } from '../types/auth';
 import { createUserDocument } from '../services/user';
 
