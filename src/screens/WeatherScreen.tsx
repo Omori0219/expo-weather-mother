@@ -1,70 +1,61 @@
-import { StyleSheet, View, Text, SafeAreaView, ScrollView, RefreshControl } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, RefreshControl } from 'react-native';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { WeatherInfo } from '../components/WeatherInfo';
-import { useUserData } from '../hooks/useUserData';
-import { useWeather } from '../hooks/useWeather';
 import { useState, useEffect, useCallback } from 'react';
 import { AREAS } from '../constants/areas';
 import { useIsFocused } from '@react-navigation/native';
-import { useUser } from '../hooks/useUser';
+import { useWeatherManager } from '../hooks/useWeatherManager';
 
 export function WeatherScreen() {
   const isFocused = useIsFocused();
-  const { userData, loadUserData, fetchUserData } = useUser();
-  const { isLoading: isWeatherLoading, error, weatherData, fetchWeather } = useWeather();
+  const { userData, weatherData, isWeatherLoading, error, refreshCurrentWeather } =
+    useWeatherManager();
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const loadWeatherData = useCallback(async () => {
-    if (userData?.areaCode) {
-      await fetchWeather(userData.areaCode);
-    }
-  }, [userData?.areaCode, fetchWeather]);
-
-  const loadInitialData = async () => {
-    try {
-      setIsInitialLoading(true);
-      const user = await loadUserData();
-      if (user?.areaCode) {
-        await fetchWeather(user.areaCode);
+  // 画面初期表示時のデータ読み込み
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        setIsInitialLoading(true);
+        await refreshCurrentWeather();
+      } finally {
+        setIsInitialLoading(false);
       }
-    } finally {
-      setIsInitialLoading(false);
-    }
-  };
+    };
 
+    loadInitialData();
+  }, [refreshCurrentWeather]);
+
+  // 画面がフォーカスされた時のデータ更新
+  useEffect(() => {
+    if (isFocused) {
+      refreshCurrentWeather();
+    }
+  }, [isFocused, refreshCurrentWeather]);
+
+  // プルリフレッシュ時の処理
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      await fetchUserData();
-      await loadWeatherData();
+      await refreshCurrentWeather();
     } finally {
       setIsRefreshing(false);
     }
-  }, [fetchUserData, loadWeatherData]);
-
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  useEffect(() => {
-    if (isFocused) {
-      fetchUserData();
-    }
-  }, [isFocused, fetchUserData]);
+  }, [refreshCurrentWeather]);
 
   const isLoading = isInitialLoading || (isWeatherLoading && !isRefreshing);
   const area = userData?.areaCode ? AREAS.find(a => a.areaCode === userData.areaCode) : null;
 
   if (!userData?.areaCode) {
     return (
-      <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.container}>
         <View style={styles.content}>
           <Text style={styles.placeholder}>地域が設定されていません</Text>
           <Text style={styles.subText}>設定画面から地域を選択してください</Text>
         </View>
-      </SafeAreaView>
+      </ScrollView>
     );
   }
 
@@ -78,9 +69,9 @@ export function WeatherScreen() {
         message={`${area?.areaName || ''}の天気情報を取得中...`}
       />
       <View style={styles.content}>
-        <Text style={styles.areaName}>選択中の地域: {userData?.areaCode || '未設定'}</Text>
+        <Text style={styles.areaName}>選択中の地域: {area?.areaName || '未設定'}</Text>
         {error ? (
-          <ErrorMessage message={error} onRetry={loadWeatherData} />
+          <ErrorMessage message={error} onRetry={handleRefresh} />
         ) : weatherData ? (
           <WeatherInfo
             weatherData={weatherData}

@@ -7,9 +7,9 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import type { RootStackNavigationProp, MainDrawerNavigationProp } from '../types/navigation';
-import { useUser } from '../hooks/useUser';
+import { useWeatherManager } from '../hooks/useWeatherManager';
 import { PREFECTURE_LIST } from '../constants/prefectures';
 
 type SetupScreenProps = {
@@ -19,7 +19,7 @@ type SetupScreenProps = {
 export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
   const stackNavigation = useNavigation<RootStackNavigationProp>();
   const drawerNavigation = useNavigation<MainDrawerNavigationProp>();
-  const { saveUserData, isLoading, error } = useUser();
+  const { updateAreaAndWeather, isWeatherLoading, error } = useWeatherManager();
   const [selectedPrefecture, setSelectedPrefecture] = useState<string | null>(null);
 
   // 地域選択後の処理
@@ -27,24 +27,24 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
     async (areaCode: string) => {
       setSelectedPrefecture(areaCode);
       try {
-        const success = await saveUserData(areaCode);
+        const success = await updateAreaAndWeather(areaCode);
         if (success) {
           if (isInitialSetup) {
             // 初期設定時はメイン画面に遷移
             stackNavigation.replace('Main');
           } else {
             // 地域変更時は前の画面に戻る
-            drawerNavigation.navigate('Weather');
+            drawerNavigation.goBack();
           }
         }
       } catch (error) {
-        // エラーは useUser 内で処理されるため、ここでは何もしない
+        // エラーは useWeatherManager 内で処理されるため、ここでは何もしない
       }
     },
-    [isInitialSetup, stackNavigation, drawerNavigation, saveUserData]
+    [isInitialSetup, stackNavigation, drawerNavigation, updateAreaAndWeather]
   );
 
-  if (isLoading) {
+  if (isWeatherLoading) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#0000ff" />
