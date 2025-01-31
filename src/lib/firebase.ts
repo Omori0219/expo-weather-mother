@@ -12,8 +12,8 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Firebase初期化の一元管理
-function initializeFirebase() {
+// Firebaseアプリの取得または初期化
+function getFirebaseApp() {
   try {
     return getApp();
   } catch {
@@ -21,16 +21,25 @@ function initializeFirebase() {
   }
 }
 
+// Firebaseの認証インスタンスの取得または初期化
+function getFirebaseAuth(app: any) {
+  try {
+    return getAuth(app);
+  } catch {
+    return initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage),
+    });
+  }
+}
+
 // アプリケーションの初期化
-const app = initializeFirebase();
+const app = getFirebaseApp();
 
 // Firestore初期化
 export const db = getFirestore(app);
 
-// Auth初期化（永続化設定付き）
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
-});
+// Auth初期化
+export const auth = getFirebaseAuth(app);
 
 // 必要なユーティリティ関数のエクスポート
 export { getApp, getAuth };
