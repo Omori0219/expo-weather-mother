@@ -14,7 +14,7 @@ export function RootStack() {
       }}
     >
       <Stack.Screen name="Splash" component={SplashScreen} />
-      <Stack.Screen name="Setup" component={SetupScreen} />
+      <Stack.Screen name="Setup" children={() => <SetupScreen isInitialSetup={true} />} />
       <Stack.Screen name="Main" component={MainDrawer} />
     </Stack.Navigator>
   );

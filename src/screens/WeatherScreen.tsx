@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, SafeAreaView } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, ScrollView, RefreshControl } from 'react-native';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { WeatherInfo } from '../components/WeatherInfo';
@@ -6,12 +6,15 @@ import { useUserData } from '../hooks/useUserData';
 import { useWeather } from '../hooks/useWeather';
 import { useState, useEffect, useCallback } from 'react';
 import { AREAS } from '../constants/areas';
+import { useIsFocused } from '@react-navigation/native';
+import { useUser } from '../hooks/useUser';
 
 export function WeatherScreen() {
+  const isFocused = useIsFocused();
+  const { userData, loadUserData, fetchUserData } = useUser();
+  const { isLoading: isWeatherLoading, error, weatherData, fetchWeather } = useWeather();
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const { userData, loadUserData } = useUserData();
-  const { isLoading: isWeatherLoading, error, weatherData, fetchWeather } = useWeather();
 
   const loadWeatherData = useCallback(async () => {
     if (userData?.areaCode) {
@@ -31,18 +34,25 @@ export function WeatherScreen() {
     }
   };
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
     try {
-      setIsRefreshing(true);
+      await fetchUserData();
       await loadWeatherData();
     } finally {
       setIsRefreshing(false);
     }
-  };
+  }, [fetchUserData, loadWeatherData]);
 
   useEffect(() => {
     loadInitialData();
   }, []);
+
+  useEffect(() => {
+    if (isFocused) {
+      fetchUserData();
+    }
+  }, [isFocused, fetchUserData]);
 
   const isLoading = isInitialLoading || (isWeatherLoading && !isRefreshing);
   const area = userData?.areaCode ? AREAS.find(a => a.areaCode === userData.areaCode) : null;
@@ -59,12 +69,16 @@ export function WeatherScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+    >
       <LoadingOverlay
         visible={isLoading}
         message={`${area?.areaName || ''}の天気情報を取得中...`}
       />
       <View style={styles.content}>
+        <Text style={styles.areaName}>選択中の地域: {userData?.areaCode || '未設定'}</Text>
         {error ? (
           <ErrorMessage message={error} onRetry={loadWeatherData} />
         ) : weatherData ? (
@@ -78,7 +92,7 @@ export function WeatherScreen() {
           !isLoading && <Text style={styles.placeholder}>天気情報を取得できませんでした</Text>
         )}
       </View>
-    </SafeAreaView>
+    </ScrollView>
   );
 }
 
@@ -101,5 +115,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
     textAlign: 'center',
+  },
+  areaName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
   },
 });
