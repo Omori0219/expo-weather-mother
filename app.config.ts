@@ -3,7 +3,7 @@ import { ExpoConfig, ConfigContext } from 'expo/config';
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'お天気おかん',
-  slug: 'weathermother',
+  slug: 'weather-mother',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
@@ -16,14 +16,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.caen.weathermother',
+    bundleIdentifier: 'jp.co.caen.weathermother',
+    config: {
+      usesNonExemptEncryption: false, // 標準/免除対象の暗号化のみを使用する場合は false
+    },
   },
   android: {
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
       backgroundColor: '#ffffff',
     },
-    package: 'com.caen.weathermother',
+    package: 'jp.co.caen.weathermother',
   },
   extra: {
     firebaseApiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
