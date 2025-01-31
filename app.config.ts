@@ -34,7 +34,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     firebaseAppId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
     firebaseMeasurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
     eas: {
-      projectId: 'your-project-id',
+      projectId: '612673a9-02e8-484d-a578-ce3c0f94ddcf',
     },
   },
   plugins: ['expo-notifications', 'expo-secure-store'],
