@@ -7,45 +7,40 @@ import { getFirebaseConfig } from '../utils/env';
 // Firebaseの設定を取得
 const firebaseConfig = getFirebaseConfig();
 
+let app: FirebaseApp;
+let db: ReturnType<typeof getFirestore>;
+let auth: ReturnType<typeof getAuth>;
+
 /**
  * Firebase関連のサービスを初期化
  */
 function initializeFirebaseServices() {
-  try {
-    // Firebaseアプリの初期化
-    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+  if (!app) {
+    try {
+      // Firebaseアプリの初期化（既に初期化されている場合は既存のインスタンスを取得）
+      app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-    // Firestoreの初期化
-    const db = getFirestore(app);
+      // Firestoreの初期化
+      db = getFirestore(app);
 
-    // Firebase Authの初期化
-    const auth = (() => {
+      // Firebase Authの初期化
       try {
         // 既存のAuth インスタンスがあれば再利用
-        const existingAuth = getAuth(app);
-        if (existingAuth) {
-          return existingAuth;
-        }
-
-        // 新しいAuth インスタンスを作成
-        return initializeAuth(app, {
-          persistence: getReactNativePersistence(AsyncStorage),
-        });
+        auth = getAuth(app);
       } catch (error) {
         console.error('[Firebase Auth] 初期化エラー:', error);
         // Authの初期化に失敗した場合でも、基本的なAuthインスタンスを返す
-        return getAuth(app);
+        auth = getAuth(app);
       }
-    })();
-
-    return { app, db, auth };
-  } catch (error) {
-    console.error('[Firebase] 初期化エラー:', error);
-    // 初期化に完全に失敗した場合は、アプリを続行できないのでエラーを投げる
-    throw new Error('Firebaseの初期化に失敗しました');
+    } catch (error) {
+      console.error('[Firebase] 初期化エラー:', error);
+      throw new Error('Firebaseの初期化に失敗しました');
+    }
   }
+
+  return { app, db, auth };
 }
 
 // Firebaseサービスの初期化と各インスタンスのエクスポート
-const { db, auth } = initializeFirebaseServices();
-export { db, auth };
+const { db: initializedDb, auth: initializedAuth } = initializeFirebaseServices();
+export { initializedDb as db, initializedAuth as auth };
