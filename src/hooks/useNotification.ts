@@ -35,17 +35,12 @@ export function useNotification() {
       });
     }
 
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
+    // 既存の権限状態に関わらず、必ず許可ダイアログを表示
+    const { status } = await Notifications.requestPermissionsAsync();
 
     return {
-      status: finalStatus,
-      canAskAgain: true, // この値は実際のデバイスの状態に応じて設定する必要があります
+      status,
+      canAskAgain: true,
     };
   }, []);
 

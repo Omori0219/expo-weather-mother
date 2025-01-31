@@ -16,6 +16,8 @@ import { useNavigation } from '@react-navigation/native';
 import type { RootStackNavigationProp, MainDrawerNavigationProp } from '../types/navigation';
 import { useWeatherManager } from '../hooks/useWeatherManager';
 import { useNotification } from '../hooks/useNotification';
+import { useAuth } from '../hooks/useAuth';
+import { updateNotificationSettings } from '../services/notification';
 import { PREFECTURE_LIST } from '../constants/prefectures';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -50,6 +52,7 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
   const insets = useSafeAreaInsets();
   const { updateAreaAndWeather, isWeatherLoading, error } = useWeatherManager();
   const { requestPermissions, getExpoPushToken } = useNotification();
+  const { user } = useAuth();
   const [selectedPrefecture, setSelectedPrefecture] = useState<string | null>(null);
   const [step, setStep] = useState<'prefecture' | 'notification'>('prefecture');
 
@@ -61,18 +64,32 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
   // 通知許可の取得処理
   const handleRequestNotificationPermission = useCallback(async () => {
     try {
+      // 1. 通知許可をリクエスト
       const { status } = await requestPermissions();
+
+      // 2. 許可された場合のみトークンを取得・保存
       if (status === 'granted') {
         await getExpoPushToken();
       }
-      // 通知の許可状態に関わらず、メイン画面に遷移
+
+      // 3. 結果に関わらずFirestoreを更新
+      if (user?.uid) {
+        await updateNotificationSettings(user.uid, {
+          isPushNotificationEnabled: status === 'granted',
+        });
+      }
+
+      // 4. メイン画面に遷移
       stackNavigation.replace('Main');
     } catch (error) {
-      console.error('Failed to request notification permission:', error);
-      // エラーが発生しても、メイン画面に遷移
+      // 5. エラー時は簡単なアラートを表示してからメイン画面へ
+      Alert.alert(
+        'エラー',
+        '通知の設定中にエラーが発生しました。後から設定メニューで変更できます。'
+      );
       stackNavigation.replace('Main');
     }
-  }, [requestPermissions, getExpoPushToken, stackNavigation]);
+  }, [requestPermissions, getExpoPushToken, stackNavigation, user]);
 
   // 確定ボタンの処理
   const handleConfirm = useCallback(async () => {
