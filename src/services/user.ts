@@ -1,5 +1,5 @@
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../lib/firebase';
 import { UserData } from '../types/user';
 
 export async function createUserDocument(userId: string): Promise<void> {

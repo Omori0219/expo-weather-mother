@@ -1,5 +1,5 @@
 import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../lib/firebase';
 import { NotificationSettings } from '../types/notification';
 
 /**
