@@ -89,14 +89,18 @@ export function WeatherScreen() {
   const renderError = () => <ErrorMessage message={error} onRetry={handleRefresh} />;
 
   // 天気情報表示
-  const renderWeatherInfo = () => (
-    <WeatherInfo
-      weatherData={weatherData}
-      areaCode={userData.areaCode}
-      onRefresh={handleRefresh}
-      isRefreshing={isRefreshing}
-    />
-  );
+  const renderWeatherInfo = () => {
+    if (!weatherData || !userData?.areaCode) return null;
+
+    return (
+      <WeatherInfo
+        weatherData={weatherData}
+        areaCode={userData.areaCode}
+        onRefresh={handleRefresh}
+        isRefreshing={isRefreshing}
+      />
+    );
+  };
 
   // データなし表示
   const renderNoData = () => <Text style={styles.placeholder}>天気情報を取得できませんでした</Text>;
@@ -104,7 +108,7 @@ export function WeatherScreen() {
   // メインコンテンツの表示
   const renderMainContent = () => {
     if (error) return renderError();
-    if (weatherData) return renderWeatherInfo();
+    if (weatherData && userData?.areaCode) return renderWeatherInfo();
     if (!isLoading) return renderNoData();
     return null;
   };

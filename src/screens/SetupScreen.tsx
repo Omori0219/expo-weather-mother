@@ -22,6 +22,7 @@ import { updateNotificationSettings } from '../services/notification';
 import { PREFECTURE_LIST } from '../constants/prefectures';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ERROR_DOMAINS, createError, handleError } from '../lib/error/handler';
+import type { NotificationPermissionState } from '../types/notification';
 
 type SetupScreenProps = {
   isInitialSetup?: boolean;
@@ -65,7 +66,7 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
 
   // 通知設定の保存
   const saveNotificationSettings = useCallback(
-    async (status: string, token?: string) => {
+    async (status: NotificationPermissionState, token?: string) => {
       if (!user?.uid) return;
 
       try {

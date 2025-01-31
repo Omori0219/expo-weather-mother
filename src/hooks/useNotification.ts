@@ -6,20 +6,18 @@ import Constants from 'expo-constants';
 import { useAuth } from './useAuth';
 import { saveExpoPushToken, updateNotificationSettings } from '../services/notification';
 import { ERROR_DOMAINS, createError, handleError } from '../lib/error/handler';
-import type { NotificationPermissionStatus } from '../types/notification';
+import type {
+  NotificationPermissionStatus,
+  NotificationPermissionState,
+} from '../types/notification';
 
 // プラットフォーム固有の設定
-const getPlatformNotificationConfig = () => {
-  if (Platform.OS === 'android') {
-    return {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    };
-  }
-  return null;
-};
+const getAndroidNotificationConfig = () => ({
+  name: 'default',
+  importance: Notifications.AndroidImportance.MAX,
+  vibrationPattern: [0, 250, 250, 250],
+  lightColor: '#FF231F7C',
+});
 
 // 通知ハンドラーの設定
 Notifications.setNotificationHandler({
@@ -50,7 +48,7 @@ export function useNotification() {
   // Android用チャンネル設定
   const setupAndroidChannel = useCallback(async () => {
     if (Platform.OS === 'android') {
-      const config = getPlatformNotificationConfig();
+      const config = getAndroidNotificationConfig();
       await Notifications.setNotificationChannelAsync('default', config);
     }
   }, []);
@@ -68,12 +66,12 @@ export function useNotification() {
         if (existingStatus === 'undetermined') {
           const { status } = await Notifications.requestPermissionsAsync();
           return {
-            status,
+            status: status as NotificationPermissionState,
             canAskAgain: status === 'undetermined',
           };
         }
         return {
-          status: existingStatus,
+          status: existingStatus as NotificationPermissionState,
           canAskAgain: false,
         };
       }
@@ -81,13 +79,13 @@ export function useNotification() {
       if (existingStatus !== 'granted') {
         const { status } = await Notifications.requestPermissionsAsync();
         return {
-          status,
+          status: status as NotificationPermissionState,
           canAskAgain: true,
         };
       }
 
       return {
-        status: existingStatus,
+        status: existingStatus as NotificationPermissionState,
         canAskAgain: true,
       };
     } catch (error) {

@@ -1,10 +1,10 @@
 export type NotificationPermissionState = 'granted' | 'denied' | 'undetermined';
 
 export interface NotificationSettings {
-  isPushNotificationEnabled: boolean | null;
+  isPushNotificationEnabled: boolean;
   permissionState: NotificationPermissionState;
-  lastUpdated: Date;
   expoPushToken?: string;
+  lastUpdated: Date;
 }
 
 export interface NotificationPermissionStatus {
@@ -12,8 +12,7 @@ export interface NotificationPermissionStatus {
   canAskAgain: boolean;
 }
 
-export interface NotificationError {
-  code: 'permission_denied' | 'token_error' | 'settings_error' | 'device_not_supported';
-  message: string;
+export interface NotificationError extends Error {
+  code: string;
   recoverable: boolean;
 }
