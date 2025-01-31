@@ -38,7 +38,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: '#ffffff',
     },
     package: 'jp.co.caen.weathermother',
-    useNextNotificationsApi: true,
   },
   plugins: [
     [
