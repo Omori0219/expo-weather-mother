@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 import { useAuth } from './useAuth';
 import { saveExpoPushToken, updateNotificationSettings } from '../services/notification';
 import { NotificationError, NotificationPermissionStatus } from '../types/notification';
@@ -47,9 +48,14 @@ export function useNotification() {
   // プッシュ通知トークンの取得
   const getExpoPushToken = useCallback(async () => {
     try {
+      const projectId = Constants.expoConfig?.extra?.easProjectId;
+      if (!projectId) {
+        throw new Error('Project ID が設定されていません');
+      }
+
       const token = (
         await Notifications.getExpoPushTokenAsync({
-          projectId: process.env.EXPO_PROJECT_ID,
+          projectId,
         })
       ).data;
 
