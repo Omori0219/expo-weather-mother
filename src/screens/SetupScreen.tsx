@@ -1,77 +1,69 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { AreaSelector } from '../components/AreaSelector';
-import { LoadingOverlay } from '../components/LoadingOverlay';
-import { ErrorMessage } from '../components/ErrorMessage';
-import { useUserData } from '../hooks/useUserData';
-import type { AreaData } from '../types/user';
 import type { RootStackNavigationProp } from '../types/navigation';
+import { useUser } from '../hooks/useUser';
+import { PREFECTURE_LIST } from '../constants/prefectures';
 
 export function SetupScreen() {
   const navigation = useNavigation<RootStackNavigationProp>();
-  const [selectedArea, setSelectedArea] = useState<AreaData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { userData, loadUserData, saveUserData } = useUserData();
+  const { saveUserData, isLoading, error } = useUser();
+  const [selectedPrefecture, setSelectedPrefecture] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  const loadInitialData = async () => {
+  // 都道府県選択時の処理
+  const handlePrefectureSelect = async (areaCode: string) => {
+    setSelectedPrefecture(areaCode);
     try {
-      setIsLoading(true);
-      setError(null);
-      await loadUserData();
-    } catch (err) {
-      setError('データの読み込みに失敗しました');
-    } finally {
-      setIsLoading(false);
+      const success = await saveUserData(areaCode);
+      if (success) {
+        navigation.replace('Weather');
+      }
+    } catch (error) {
+      // エラーは useUser 内で処理されるため、ここでは何もしない
     }
   };
 
-  const handleAreaSelect = async (area: AreaData) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      setSelectedArea(area);
-      await saveUserData({ areaCode: area.areaCode });
-    } catch (err) {
-      setError('地域の保存に失敗しました');
-      setSelectedArea(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleNext = () => {
-    navigation.replace('Weather');
-  };
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <LoadingOverlay visible={isLoading} message="読み込み中..." />
-      <View style={styles.content}>
-        <Text style={styles.title}>お住まいの地域を選択してください</Text>
-        <Text style={styles.subtitle}>選択した地域の天気予報をお届けします</Text>
-        {error ? (
-          <ErrorMessage message={error} onRetry={loadInitialData} />
-        ) : (
-          <>
-            <AreaSelector
-              onSelect={handleAreaSelect}
-              selectedAreaCode={selectedArea?.areaCode || userData?.areaCode}
-            />
-            {(selectedArea || userData?.areaCode) && (
-              <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-                <Text style={styles.nextButtonText}>次へ</Text>
-              </TouchableOpacity>
-            )}
-          </>
-        )}
-      </View>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <Text style={styles.title}>お住まいの地域を選択してください</Text>
+      {error && <Text style={styles.error}>{error}</Text>}
+      <ScrollView style={styles.scrollView}>
+        {PREFECTURE_LIST.map(prefecture => (
+          <TouchableOpacity
+            key={prefecture.areaCode}
+            style={[
+              styles.prefectureButton,
+              selectedPrefecture === prefecture.areaCode && styles.selectedButton,
+            ]}
+            onPress={() => handlePrefectureSelect(prefecture.areaCode)}
+          >
+            <Text
+              style={[
+                styles.prefectureText,
+                selectedPrefecture === prefecture.areaCode && styles.selectedButtonText,
+              ]}
+            >
+              {prefecture.areaName}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -79,34 +71,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  content: {
-    flex: 1,
     padding: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 8,
+    marginVertical: 20,
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 24,
+  scrollView: {
+    flex: 1,
   },
-  nextButton: {
-    backgroundColor: '#007AFF',
+  prefectureButton: {
     padding: 16,
-    borderRadius: 8,
-    marginTop: 24,
-    marginHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
-  nextButtonText: {
+  selectedButton: {
+    backgroundColor: '#007AFF',
+  },
+  prefectureText: {
+    fontSize: 16,
+  },
+  selectedButtonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+  },
+  error: {
+    color: 'red',
     textAlign: 'center',
+    marginBottom: 10,
   },
 });
