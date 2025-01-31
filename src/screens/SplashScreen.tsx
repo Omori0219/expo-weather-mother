@@ -17,8 +17,8 @@ export function SplashScreen() {
         // 2秒後に画面遷移
         setTimeout(() => {
           if (userData?.areaCode) {
-            // 地域コードが設定済みの場合は天気画面へ
-            navigation.replace('Weather');
+            // 地域コードが設定済みの場合はメイン画面へ
+            navigation.replace('Main');
           } else {
             // 未設定の場合は設定画面へ
             navigation.replace('Setup');
