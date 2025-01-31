@@ -1,27 +1,39 @@
 import { useEffect } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { RootStackNavigationProp } from '../types/navigation';
-import { useAuth } from '../hooks/useAuth';
+import type { RootStackNavigationProp } from '../types/navigation';
+import { useUser } from '../hooks/useUser';
 
 export function SplashScreen() {
   const navigation = useNavigation<RootStackNavigationProp>();
-  const { user } = useAuth();
+  const { fetchUserData } = useUser();
 
   useEffect(() => {
-    // スプラッシュ画面を2秒間表示
-    const timer = setTimeout(() => {
-      // ユーザーの状態に応じて画面遷移
-      if (user) {
-        // ユーザーの都道府県設定を確認する処理は後で実装
-        navigation.replace('Setup');
-      } else {
-        navigation.replace('Setup');
-      }
-    }, 2000);
+    const checkUserData = async () => {
+      try {
+        // ユーザーデータを取得
+        const userData = await fetchUserData();
 
-    return () => clearTimeout(timer);
-  }, [navigation, user]);
+        // 2秒後に画面遷移
+        setTimeout(() => {
+          if (userData?.areaCode) {
+            // 地域コードが設定済みの場合は天気画面へ
+            navigation.replace('Weather');
+          } else {
+            // 未設定の場合は設定画面へ
+            navigation.replace('Setup');
+          }
+        }, 2000);
+      } catch (error) {
+        // エラー時は設定画面へ
+        setTimeout(() => {
+          navigation.replace('Setup');
+        }, 2000);
+      }
+    };
+
+    checkUserData();
+  }, [navigation, fetchUserData]);
 
   return (
     <View style={styles.container}>
