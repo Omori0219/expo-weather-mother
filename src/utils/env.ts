@@ -8,6 +8,12 @@ import type { AppConfig } from '../types/env';
 export function getFirebaseConfig() {
   const config = Constants.expoConfig as AppConfig;
 
+  // デバッグ用：設定値の確認
+  console.log('Config:', {
+    hasExtra: !!config?.extra,
+    extraKeys: config?.extra ? Object.keys(config.extra) : [],
+  });
+
   if (!config?.extra) {
     throw new Error('環境変数が設定されていません');
   }
@@ -21,6 +27,17 @@ export function getFirebaseConfig() {
     firebaseAppId,
     firebaseMeasurementId,
   } = config.extra;
+
+  // デバッグ用：環境変数の存在確認
+  console.log('Firebase Config Values:', {
+    hasApiKey: !!firebaseApiKey,
+    hasAuthDomain: !!firebaseAuthDomain,
+    hasProjectId: !!firebaseProjectId,
+    hasStorageBucket: !!firebaseStorageBucket,
+    hasMessagingSenderId: !!firebaseMessagingSenderId,
+    hasAppId: !!firebaseAppId,
+    hasMeasurementId: !!firebaseMeasurementId,
+  });
 
   // 必須の環境変数をチェック
   const requiredEnvVars = {
