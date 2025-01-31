@@ -48,7 +48,7 @@ export function useNotification() {
   // プッシュ通知トークンの取得
   const getExpoPushToken = useCallback(async () => {
     try {
-      const projectId = Constants.expoConfig?.extra?.easProjectId;
+      const projectId = Constants.expoConfig?.extra?.eas?.projectId;
       console.log('Project ID:', projectId);
 
       if (!projectId) {
