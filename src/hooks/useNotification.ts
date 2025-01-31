@@ -36,11 +36,30 @@ export function useNotification() {
       });
     }
 
-    // 既存の権限状態に関わらず、必ず許可ダイアログを表示
-    const { status } = await Notifications.requestPermissionsAsync();
+    // 現在の権限状態を確認
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    console.log('既存の通知許可状態:', existingStatus);
+
+    // iOS の場合、必ずシステムの許可ダイアログを表示
+    if (Platform.OS === 'ios') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      return {
+        status,
+        canAskAgain: true,
+      };
+    }
+
+    // Android の場合は既存の権限状態を確認
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      return {
+        status,
+        canAskAgain: true,
+      };
+    }
 
     return {
-      status,
+      status: existingStatus,
       canAskAgain: true,
     };
   }, []);
