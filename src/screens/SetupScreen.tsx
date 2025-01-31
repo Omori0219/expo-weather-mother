@@ -21,6 +21,7 @@ import { useAuth } from '../hooks/useAuth';
 import { updateNotificationSettings } from '../services/notification';
 import { PREFECTURE_LIST } from '../constants/prefectures';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ERROR_DOMAINS, createError, handleError } from '../lib/error/handler';
 
 type SetupScreenProps = {
   isInitialSetup?: boolean;
@@ -51,7 +52,7 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
   const stackNavigation = useNavigation<RootStackNavigationProp>();
   const drawerNavigation = useNavigation<MainDrawerNavigationProp>();
   const insets = useSafeAreaInsets();
-  const { updateAreaAndWeather, isWeatherLoading, error } = useWeatherManager();
+  const { updateAreaAndWeather, isWeatherLoading, error: weatherError } = useWeatherManager();
   const { requestPermissions, getExpoPushToken } = useNotification();
   const { user } = useAuth();
   const [selectedPrefecture, setSelectedPrefecture] = useState<string | null>(null);
@@ -62,61 +63,54 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
     setSelectedPrefecture(areaCode);
   }, []);
 
+  // 通知設定の保存
+  const saveNotificationSettings = useCallback(
+    async (status: string, token?: string) => {
+      if (!user?.uid) return;
+
+      try {
+        await updateNotificationSettings(user.uid, {
+          isPushNotificationEnabled: status === 'granted',
+          permissionState: status,
+          ...(token && { expoPushToken: token }),
+          lastUpdated: new Date(),
+        });
+      } catch (error) {
+        const message = handleError(error, ERROR_DOMAINS.SETUP);
+        throw createError(message, 'settings_save_error', ERROR_DOMAINS.SETUP);
+      }
+    },
+    [user]
+  );
+
   // 通知許可の取得処理
   const handleRequestNotificationPermission = useCallback(async () => {
     try {
-      // 初期設定フェーズでは、現在の状態に関係なく必ず許可ダイアログを表示
-      console.log('通知許可をリクエスト開始...');
-      const { status } = await Notifications.requestPermissionsAsync();
-      console.log('通知許可リクエスト結果:', status);
+      const { status } = await requestPermissions();
 
-      if (user?.uid) {
-        if (status === 'granted') {
-          try {
-            // トークンの取得
-            const token = await getExpoPushToken();
-            // Firestoreの更新
-            await updateNotificationSettings(user.uid, {
-              isPushNotificationEnabled: true,
-              permissionState: status,
-              expoPushToken: token,
-              lastUpdated: new Date(),
-            });
-          } catch (tokenError) {
-            console.error('トークン取得エラー:', tokenError);
-            // トークン取得エラーでも、許可状態は保存
-            await updateNotificationSettings(user.uid, {
-              isPushNotificationEnabled: true,
-              permissionState: status,
-              lastUpdated: new Date(),
-            });
-          }
-        } else if (status === 'denied') {
-          // 拒否された場合は、その状態を記録するのみ
-          await updateNotificationSettings(user.uid, {
-            permissionState: status,
-            isPushNotificationEnabled: false,
-            lastUpdated: new Date(),
-          });
+      if (status === 'granted') {
+        try {
+          const token = await getExpoPushToken();
+          await saveNotificationSettings(status, token);
+        } catch (tokenError) {
+          console.error('トークン取得エラー:', tokenError);
+          await saveNotificationSettings(status);
         }
+      } else {
+        await saveNotificationSettings(status);
       }
 
-      // 選択結果に関わらず、そのままメイン画面へ遷移
       stackNavigation.replace('Main');
     } catch (error) {
-      console.error('通知設定エラーの詳細:', error);
-
-      // エラーの場合のみ、ユーザーに通知
-      const errorMessage = error instanceof Error ? error.message : '不明なエラーが発生しました';
-
-      Alert.alert('エラー', `通知の設定中にエラーが発生しました: ${errorMessage}`, [
+      const message = handleError(error, ERROR_DOMAINS.SETUP);
+      Alert.alert('エラー', `通知の設定中にエラーが発生しました: ${message}`, [
         {
           text: 'OK',
           onPress: () => stackNavigation.replace('Main'),
         },
       ]);
     }
-  }, [getExpoPushToken, updateNotificationSettings, stackNavigation, user]);
+  }, [requestPermissions, getExpoPushToken, saveNotificationSettings, stackNavigation]);
 
   // 確定ボタンの処理
   const handleConfirm = useCallback(async () => {
@@ -132,7 +126,8 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
         }
       }
     } catch (error) {
-      // エラーは useWeatherManager 内で処理されるため、ここでは何もしない
+      const message = handleError(error, ERROR_DOMAINS.SETUP);
+      Alert.alert('エラー', message);
     }
   }, [selectedPrefecture, isInitialSetup, drawerNavigation, updateAreaAndWeather]);
 
@@ -141,44 +136,43 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
     paddingTop: Platform.OS === 'android' ? insets.top : 0,
   };
 
-  if (isWeatherLoading) {
-    return (
-      <SafeAreaView style={containerStyle}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-        </View>
-      </SafeAreaView>
-    );
-  }
+  // ローディング表示
+  const renderLoading = () => (
+    <SafeAreaView style={containerStyle}>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    </SafeAreaView>
+  );
 
-  if (step === 'notification') {
-    return (
-      <SafeAreaView style={containerStyle}>
-        <View style={styles.notificationContainer}>
-          <Text style={styles.title}>通知の設定</Text>
-          <Text style={styles.description}>
-            毎朝7時に、お母さんからの天気予報メッセージを受け取るには、通知をオンにしてください。
-          </Text>
-          <Text style={styles.benefit}>通知をオンにすると、雨の日も傘を忘れない！</Text>
-          <View style={styles.bottomContainer}>
-            <TouchableOpacity
-              style={styles.confirmButton}
-              onPress={handleRequestNotificationPermission}
-            >
-              <Text style={styles.confirmButtonText}>通知を許可する</Text>
-            </TouchableOpacity>
-          </View>
+  // 通知設定画面
+  const renderNotificationStep = () => (
+    <SafeAreaView style={containerStyle}>
+      <View style={styles.notificationContainer}>
+        <Text style={styles.title}>通知の設定</Text>
+        <Text style={styles.description}>
+          毎朝7時に、お母さんからの天気予報メッセージを受け取るには、通知をオンにしてください。
+        </Text>
+        <Text style={styles.benefit}>通知をオンにすると、雨の日も傘を忘れない！</Text>
+        <View style={styles.bottomContainer}>
+          <TouchableOpacity
+            style={styles.confirmButton}
+            onPress={handleRequestNotificationPermission}
+          >
+            <Text style={styles.confirmButtonText}>通知を許可する</Text>
+          </TouchableOpacity>
         </View>
-      </SafeAreaView>
-    );
-  }
+      </View>
+    </SafeAreaView>
+  );
 
-  return (
+  // 地域選択画面
+  const renderPrefectureStep = () => (
     <SafeAreaView style={containerStyle}>
       <Text style={styles.title}>
         {isInitialSetup ? 'お住まいの地域を選択してください' : '地域を変更'}
       </Text>
-      {error && <Text style={styles.error}>{error}</Text>}
+      {weatherError && <Text style={styles.error}>{weatherError}</Text>}
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{
@@ -227,6 +221,16 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
       </View>
     </SafeAreaView>
   );
+
+  if (isWeatherLoading) {
+    return renderLoading();
+  }
+
+  if (step === 'notification') {
+    return renderNotificationStep();
+  }
+
+  return renderPrefectureStep();
 }
 
 const styles = StyleSheet.create<SetupScreenStyles>({
