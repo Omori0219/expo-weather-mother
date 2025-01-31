@@ -7,10 +7,11 @@ import { AuthProvider } from './src/contexts/AuthContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
 import * as Sentry from 'sentry-expo';
+import Constants from 'expo-constants';
 
 // Sentryの初期化
 Sentry.init({
-  dsn: process.env.SENTRY_DSN,
+  dsn: Constants.expoConfig?.extra?.sentry?.dsn,
   enableInExpoDevelopment: true,
   debug: __DEV__,
 });
