@@ -1,4 +1,4 @@
-import { initializeApp, getApp, FirebaseApp } from 'firebase/app';
+import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { initializeAuth, getAuth, getReactNativePersistence, Auth } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,16 +10,27 @@ const firebaseConfig = {
   storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Firebaseアプリの取得または初期化
-function getFirebaseApp(): FirebaseApp {
+// Firebaseの初期化
+function initializeFirebase(): FirebaseApp {
   try {
+    if (getApps().length === 0) {
+      return initializeApp(firebaseConfig);
+    }
     return getApp();
-  } catch {
-    return initializeApp(firebaseConfig);
+  } catch (error) {
+    console.error('Failed to initialize Firebase:', error);
+    throw new Error('Firebaseの初期化に失敗しました');
   }
 }
+
+// Firebaseアプリのインスタンスを取得
+export const app = initializeFirebase();
+
+// Firestoreのインスタンスを取得
+export const db = getFirestore(app);
 
 // Firebaseの認証インスタンスの取得または初期化
 function getFirebaseAuth(app: FirebaseApp): Auth {
@@ -30,12 +41,6 @@ function getFirebaseAuth(app: FirebaseApp): Auth {
     })
   );
 }
-
-// アプリケーションの初期化
-const app = getFirebaseApp();
-
-// Firestore初期化
-export const db = getFirestore(app);
 
 // Auth初期化
 export const auth = getFirebaseAuth(app);

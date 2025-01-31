@@ -37,5 +37,5 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       projectId: 'your-project-id',
     },
   },
-  plugins: ['expo-notifications'],
+  plugins: ['expo-notifications', 'expo-secure-store'],
 });

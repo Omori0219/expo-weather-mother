@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import { db } from '../lib/firebase';
+import { firebaseAuth } from '../lib/firebase-auth';
 import type { UserDocument, UserData } from '../types/user';
 
 export function useUser() {
@@ -9,10 +10,23 @@ export function useUser() {
   const [error, setError] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
 
+  // 認証状態の監視
+  useEffect(() => {
+    const unsubscribe = firebaseAuth.onAuthStateChanged(async user => {
+      if (user) {
+        await fetchUserData();
+      } else {
+        setUserData(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   // ユーザーデータの取得
   const fetchUserData = useCallback(async () => {
-    const auth = getAuth();
-    if (!auth.currentUser) {
+    const user = firebaseAuth.getCurrentUser();
+    if (!user) {
       return null;
     }
 
@@ -20,7 +34,7 @@ export function useUser() {
       setIsLoading(true);
       setError(null);
 
-      const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
 
       if (!userDoc.exists()) {
         return null;
@@ -43,10 +57,17 @@ export function useUser() {
   }, []);
 
   // ユーザーデータの保存
-  const saveUserData = useCallback(async (areaCode: string) => {
-    const auth = getAuth();
-    if (!auth.currentUser) {
-      throw new Error('ユーザーが認証されていません');
+  const saveUserData = useCallback(async (areaCode: string): Promise<boolean> => {
+    let user = firebaseAuth.getCurrentUser();
+
+    if (!user) {
+      try {
+        // 未認証の場合は匿名認証を行う
+        user = await firebaseAuth.signInAnonymously();
+      } catch (err) {
+        setError('認証に失敗しました');
+        return false;
+      }
     }
 
     try {
@@ -58,7 +79,7 @@ export function useUser() {
         createdAt: Timestamp.now(),
       };
 
-      await setDoc(doc(db, 'users', auth.currentUser.uid), userData);
+      await setDoc(doc(db, 'users', user.uid), userData);
 
       setUserData({
         areaCode,
