@@ -55,13 +55,15 @@ export function useNotification() {
         const { status } = await Notifications.requestPermissionsAsync();
         return {
           status,
-          canAskAgain: true,
+          // iOSの場合、undeterminedの場合のみ再度許可を求めることができる
+          canAskAgain: status === 'undetermined',
         };
       }
       // 既に設定済みの場合は現在の状態を返す
       return {
         status: existingStatus,
-        canAskAgain: await Notifications.canAskAgain(),
+        // denied の場合は設定アプリから変更する必要がある
+        canAskAgain: false,
       };
     }
 
@@ -70,6 +72,7 @@ export function useNotification() {
       const { status } = await Notifications.requestPermissionsAsync();
       return {
         status,
+        // Androidの場合は常に再度許可を求めることができる
         canAskAgain: true,
       };
     }
