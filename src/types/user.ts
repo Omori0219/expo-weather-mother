@@ -1,9 +1,13 @@
+import { Timestamp } from 'firebase/firestore';
+
+export interface UserDocument {
+  areaCode: string;
+  createdAt: Timestamp;
+}
+
 export interface UserData {
-  userId: string;
   areaCode?: string;
-  preferredPushNotificationTime?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
 }
 
 // 地域データの型定義
