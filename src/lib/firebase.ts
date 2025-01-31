@@ -1,4 +1,4 @@
-import { initializeApp, getApp } from 'firebase/app';
+import { initializeApp, getApp, FirebaseApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { initializeAuth, getAuth, getReactNativePersistence, Auth } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,7 +13,7 @@ const firebaseConfig = {
 };
 
 // Firebaseアプリの取得または初期化
-function getFirebaseApp() {
+function getFirebaseApp(): FirebaseApp {
   try {
     return getApp();
   } catch {
@@ -22,14 +22,13 @@ function getFirebaseApp() {
 }
 
 // Firebaseの認証インスタンスの取得または初期化
-function getFirebaseAuth(app: any) {
-  try {
-    return getAuth(app);
-  } catch {
-    return initializeAuth(app, {
+function getFirebaseAuth(app: FirebaseApp): Auth {
+  return (
+    getAuth(app) ||
+    initializeAuth(app, {
       persistence: getReactNativePersistence(AsyncStorage),
-    });
-  }
+    })
+  );
 }
 
 // アプリケーションの初期化
@@ -39,7 +38,7 @@ const app = getFirebaseApp();
 export const db = getFirestore(app);
 
 // Auth初期化
-export const auth: Auth = getFirebaseAuth(app);
+export const auth = getFirebaseAuth(app);
 
 // 必要なユーティリティ関数のエクスポート
 export { getApp, getAuth };
