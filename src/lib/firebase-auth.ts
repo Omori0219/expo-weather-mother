@@ -1,9 +1,6 @@
-import { getAuth, signInAnonymously, onAuthStateChanged, type User } from 'firebase/auth';
+import { signInAnonymously, onAuthStateChanged, type User } from 'firebase/auth';
 import { secureStorage } from './secure-storage';
-import { app } from './firebase';
-
-// Firebase Authのインスタンスを取得
-const auth = getAuth(app);
+import { auth } from './firebase';
 
 /**
  * Firebase認証に関するユーティリティ
