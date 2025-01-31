@@ -81,10 +81,11 @@ weather_data/ // コレクション名
 ```
 users/ // コレクション名
   └── ユーザー ID (Firebase Authentication で生成される UID)/ // ドキュメントID
-       ├── user_id: string      // 地域コード（例：130000）
-       ├── prefecture: string  // ユーザーが選択した都道府県 (例: `tokyo`, `ehime`)
+       ├── userId: string      // ユーザー ID (Firebase Authentication で生成される UID)
+       ├── areaCode: string  // ユーザーが選択した地域の地域コード (例: 016000)
        ├── preferredPushNotificationTime: string   // ユーザーが設定したプッシュ通知希望時刻 (例: `07:00`) (オプション機能。MVPでは使用しないが、将来のために定義しておく)
-       └── createdat: timestamp    // ユーザー情報作成日時
+       ├── createdAt: timestamp    // ユーザー情報作成日時
+	   └── updatedAt: timestamp    // ユーザー情報更新日時
 ```
 **サンプルデータ**
 ```json

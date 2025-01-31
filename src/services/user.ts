@@ -9,6 +9,7 @@ export async function createUserDocument(userId: string): Promise<void> {
   if (!userSnap.exists()) {
     const userData: UserData = {
       userId,
+      areaCode: '',
       createdAt: new Date(),
       updatedAt: new Date(),
     };
