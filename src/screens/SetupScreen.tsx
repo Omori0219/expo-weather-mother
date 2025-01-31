@@ -10,10 +10,12 @@ import {
   ViewStyle,
   TextStyle,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { RootStackNavigationProp, MainDrawerNavigationProp } from '../types/navigation';
 import { useWeatherManager } from '../hooks/useWeatherManager';
+import { useNotification } from '../hooks/useNotification';
 import { PREFECTURE_LIST } from '../constants/prefectures';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -37,6 +39,9 @@ type SetupScreenStyles = {
   confirmButtonText: TextStyle;
   confirmButtonTextDisabled: TextStyle;
   bottomContainer: ViewStyle;
+  notificationContainer: ViewStyle;
+  description: TextStyle;
+  benefit: TextStyle;
 };
 
 export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
@@ -44,12 +49,30 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
   const drawerNavigation = useNavigation<MainDrawerNavigationProp>();
   const insets = useSafeAreaInsets();
   const { updateAreaAndWeather, isWeatherLoading, error } = useWeatherManager();
+  const { requestPermissions, getExpoPushToken } = useNotification();
   const [selectedPrefecture, setSelectedPrefecture] = useState<string | null>(null);
+  const [step, setStep] = useState<'prefecture' | 'notification'>('prefecture');
 
   // 地域選択の処理
   const handlePrefectureSelect = useCallback((areaCode: string) => {
     setSelectedPrefecture(areaCode);
   }, []);
+
+  // 通知許可の取得処理
+  const handleRequestNotificationPermission = useCallback(async () => {
+    try {
+      const { status } = await requestPermissions();
+      if (status === 'granted') {
+        await getExpoPushToken();
+      }
+      // 通知の許可状態に関わらず、メイン画面に遷移
+      stackNavigation.replace('Main');
+    } catch (error) {
+      console.error('Failed to request notification permission:', error);
+      // エラーが発生しても、メイン画面に遷移
+      stackNavigation.replace('Main');
+    }
+  }, [requestPermissions, getExpoPushToken, stackNavigation]);
 
   // 確定ボタンの処理
   const handleConfirm = useCallback(async () => {
@@ -59,7 +82,7 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
       const success = await updateAreaAndWeather(selectedPrefecture);
       if (success) {
         if (isInitialSetup) {
-          stackNavigation.replace('Main');
+          setStep('notification');
         } else {
           drawerNavigation.goBack();
         }
@@ -67,7 +90,7 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
     } catch (error) {
       // エラーは useWeatherManager 内で処理されるため、ここでは何もしない
     }
-  }, [selectedPrefecture, isInitialSetup, stackNavigation, drawerNavigation, updateAreaAndWeather]);
+  }, [selectedPrefecture, isInitialSetup, drawerNavigation, updateAreaAndWeather]);
 
   const containerStyle = {
     ...styles.container,
@@ -79,6 +102,28 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
       <SafeAreaView style={containerStyle}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#007AFF" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (step === 'notification') {
+    return (
+      <SafeAreaView style={containerStyle}>
+        <View style={styles.notificationContainer}>
+          <Text style={styles.title}>通知の設定</Text>
+          <Text style={styles.description}>
+            毎朝7時に、お母さんからの天気予報メッセージを受け取るには、通知をオンにしてください。
+          </Text>
+          <Text style={styles.benefit}>通知をオンにすると、雨の日も傘を忘れない！</Text>
+          <View style={styles.bottomContainer}>
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={handleRequestNotificationPermission}
+            >
+              <Text style={styles.confirmButtonText}>通知を許可する</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </SafeAreaView>
     );
@@ -271,5 +316,39 @@ const styles = StyleSheet.create<SetupScreenStyles>({
   },
   confirmButtonTextDisabled: {
     color: '#999',
+  },
+  notificationContainer: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#fff',
+  },
+  description: {
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+    marginVertical: 20,
+    lineHeight: 24,
+    ...Platform.select({
+      ios: {
+        fontWeight: '400',
+      },
+      android: {
+        fontFamily: 'sans-serif',
+      },
+    }),
+  },
+  benefit: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+    ...Platform.select({
+      ios: {
+        fontWeight: '400',
+      },
+      android: {
+        fontFamily: 'sans-serif',
+      },
+    }),
   },
 });
