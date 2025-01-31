@@ -51,6 +51,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     'expo-secure-store',
+    [
+      'sentry-expo',
+      {
+        organization: process.env.SENTRY_ORG,
+        project: process.env.SENTRY_PROJECT,
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+      },
+    ],
   ],
   extra: {
     firebaseApiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -66,5 +74,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   experiments: {
     tsconfigPaths: true,
+  },
+  hooks: {
+    postPublish: [
+      {
+        file: 'sentry-expo/upload-sourcemaps',
+        config: {
+          organization: process.env.SENTRY_ORG,
+          project: process.env.SENTRY_PROJECT,
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+        },
+      },
+    ],
   },
 });

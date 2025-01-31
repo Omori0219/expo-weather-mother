@@ -6,6 +6,14 @@ import { RootStack } from './src/navigation/RootStack';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
+import * as Sentry from 'sentry-expo';
+
+// Sentryの初期化
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  enableInExpoDevelopment: true,
+  debug: __DEV__,
+});
 
 export default function App() {
   return (
