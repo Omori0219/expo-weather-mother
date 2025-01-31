@@ -12,6 +12,7 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import { useNavigation } from '@react-navigation/native';
 import type { RootStackNavigationProp, MainDrawerNavigationProp } from '../types/navigation';
 import { useWeatherManager } from '../hooks/useWeatherManager';
@@ -64,12 +65,12 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
   // 通知許可の取得処理
   const handleRequestNotificationPermission = useCallback(async () => {
     try {
-      // 1. 通知許可をリクエスト
-      const { status, canAskAgain } = await requestPermissions();
-      console.log('通知許可状態:', status, 'canAskAgain:', canAskAgain);
+      // 初期設定フェーズでは、現在の状態に関係なく必ず許可ダイアログを表示
+      console.log('通知許可をリクエスト開始...');
+      const { status } = await Notifications.requestPermissionsAsync();
+      console.log('通知許可リクエスト結果:', status);
 
       if (user?.uid) {
-        // 2. 許可状態に応じた処理
         if (status === 'granted') {
           try {
             // トークンの取得
@@ -88,25 +89,20 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
               permissionState: status,
             });
           }
-        } else if (status === 'denied') {
+        } else {
           // 拒否された場合は、その状態のみを記録
           await updateNotificationSettings(user.uid, {
             permissionState: status,
             isPushNotificationEnabled: null,
           });
         }
-        // undetermined の場合は更新しない
       }
 
-      // 3. 結果に応じたUI表示とナビゲーション
+      // 結果に応じたUI表示とナビゲーション
       if (status === 'granted') {
         stackNavigation.replace('Main');
       } else {
-        const message = !canAskAgain
-          ? '設定アプリから通知を許可することができます。'
-          : '後から設定メニューで通知を有効にできます。';
-
-        Alert.alert('通知がオフになっています', message, [
+        Alert.alert('通知がオフになっています', '後から設定メニューで通知を有効にできます。', [
           {
             text: 'OK',
             onPress: () => stackNavigation.replace('Main'),
@@ -130,7 +126,7 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
         ]
       );
     }
-  }, [requestPermissions, getExpoPushToken, updateNotificationSettings, stackNavigation, user]);
+  }, [getExpoPushToken, updateNotificationSettings, stackNavigation, user]);
 
   // 確定ボタンの処理
   const handleConfirm = useCallback(async () => {
