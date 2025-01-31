@@ -49,6 +49,8 @@ export function useNotification() {
   const getExpoPushToken = useCallback(async () => {
     try {
       const projectId = Constants.expoConfig?.extra?.easProjectId;
+      console.log('Project ID:', projectId);
+
       if (!projectId) {
         throw new Error('Project ID が設定されていません');
       }
@@ -59,6 +61,7 @@ export function useNotification() {
         })
       ).data;
 
+      console.log('取得したトークン:', token);
       setExpoPushToken(token);
 
       if (user?.uid) {

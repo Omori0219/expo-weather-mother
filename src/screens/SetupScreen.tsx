@@ -66,6 +66,7 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
     try {
       // 1. 通知許可をリクエスト
       const { status } = await requestPermissions();
+      console.log('通知許可状態:', status);
 
       // 2. 許可された場合のみトークンを取得・保存
       if (status === 'granted') {
@@ -82,10 +83,13 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
       // 4. メイン画面に遷移
       stackNavigation.replace('Main');
     } catch (error) {
-      // 5. エラー時は簡単なアラートを表示してからメイン画面へ
+      // エラーの詳細をコンソールに出力
+      console.error('通知設定エラーの詳細:', error);
+
+      // ユーザーにより詳細なエラー情報を表示
       Alert.alert(
         'エラー',
-        '通知の設定中にエラーが発生しました。後から設定メニューで変更できます。'
+        `通知の設定中にエラーが発生しました: ${error instanceof Error ? error.message : '不明なエラー'}\n\n後から設定メニューで変更できます。`
       );
       stackNavigation.replace('Main');
     }
