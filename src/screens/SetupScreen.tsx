@@ -80,6 +80,7 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
               isPushNotificationEnabled: true,
               permissionState: status,
               expoPushToken: token,
+              lastUpdated: new Date(),
             });
           } catch (tokenError) {
             console.error('トークン取得エラー:', tokenError);
@@ -87,13 +88,15 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
             await updateNotificationSettings(user.uid, {
               isPushNotificationEnabled: true,
               permissionState: status,
+              lastUpdated: new Date(),
             });
           }
-        } else {
-          // 拒否された場合は、その状態のみを記録
+        } else if (status === 'denied') {
+          // 拒否された場合は、その状態を明示的に記録
           await updateNotificationSettings(user.uid, {
             permissionState: status,
-            isPushNotificationEnabled: null,
+            isPushNotificationEnabled: false,
+            lastUpdated: new Date(),
           });
         }
       }
