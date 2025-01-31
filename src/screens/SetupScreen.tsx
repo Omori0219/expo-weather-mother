@@ -7,6 +7,8 @@ import {
   ScrollView,
   ActivityIndicator,
   Platform,
+  ViewStyle,
+  TextStyle,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { RootStackNavigationProp, MainDrawerNavigationProp } from '../types/navigation';
@@ -16,6 +18,19 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type SetupScreenProps = {
   isInitialSetup?: boolean;
+};
+
+type SetupScreenStyles = {
+  container: ViewStyle;
+  loadingContainer: ViewStyle;
+  title: TextStyle;
+  scrollView: ViewStyle;
+  scrollViewContent: ViewStyle;
+  prefectureButton: ViewStyle;
+  selectedButton: ViewStyle;
+  prefectureText: TextStyle;
+  selectedButtonText: TextStyle;
+  error: TextStyle;
 };
 
 export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
@@ -70,7 +85,10 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
       {error && <Text style={styles.error}>{error}</Text>}
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollViewContent}
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingBottom: insets.bottom + 16,
+        }}
         showsVerticalScrollIndicator={false}
       >
         {PREFECTURE_LIST.map(prefecture => (
@@ -97,7 +115,7 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create<SetupScreenStyles>({
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -126,7 +144,6 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     paddingHorizontal: 16,
-    paddingBottom: insets => insets.bottom + 16,
   },
   prefectureButton: {
     padding: 16,

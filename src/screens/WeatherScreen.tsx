@@ -1,4 +1,13 @@
-import { StyleSheet, View, Text, ScrollView, RefreshControl, Platform } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  RefreshControl,
+  Platform,
+  ViewStyle,
+  TextStyle,
+} from 'react-native';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { WeatherInfo } from '../components/WeatherInfo';
@@ -7,6 +16,15 @@ import { AREAS } from '../constants/areas';
 import { useIsFocused } from '@react-navigation/native';
 import { useWeatherManager } from '../hooks/useWeatherManager';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+
+type WeatherScreenStyles = {
+  container: ViewStyle;
+  scrollViewContent: ViewStyle;
+  content: ViewStyle;
+  placeholder: TextStyle;
+  subText: TextStyle;
+  areaName: TextStyle;
+};
 
 export function WeatherScreen() {
   const isFocused = useIsFocused();
@@ -98,7 +116,7 @@ export function WeatherScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create<WeatherScreenStyles>({
   container: {
     flex: 1,
     backgroundColor: '#fff',
