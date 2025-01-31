@@ -32,7 +32,7 @@ export const firebaseAuth = {
 
       return user;
     } catch (error) {
-      console.error('Failed to sign in anonymously:', error);
+      console.error('[Firebase Auth] 匿名認証エラー:', error);
       throw new Error('匿名認証に失敗しました');
     }
   },
@@ -45,7 +45,7 @@ export const firebaseAuth = {
       await auth.signOut();
       await secureStorage.clearAuth();
     } catch (error) {
-      console.error('Failed to sign out:', error);
+      console.error('[Firebase Auth] サインアウトエラー:', error);
       throw new Error('サインアウトに失敗しました');
     }
   },
