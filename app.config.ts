@@ -13,12 +13,23 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     resizeMode: 'contain',
     backgroundColor: '#ffffff',
   },
+  notification: {
+    icon: './assets/notification-icon.png',
+    color: '#ffffff',
+    iosDisplayInForeground: true,
+    androidMode: 'default',
+    androidCollapsedTitle: 'お天気おかん',
+  },
   assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'jp.co.caen.weathermother',
+    infoPlist: {
+      UIBackgroundModes: ['remote-notification'],
+      ITSAppUsesNonExemptEncryption: false,
+    },
     config: {
-      usesNonExemptEncryption: false, // 標準/免除対象の暗号化のみを使用する場合は false
+      usesNonExemptEncryption: false,
     },
   },
   android: {
@@ -27,7 +38,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: '#ffffff',
     },
     package: 'jp.co.caen.weathermother',
+    useNextNotificationsApi: true,
   },
+  plugins: [
+    [
+      'expo-notifications',
+      {
+        icon: './assets/notification-icon.png',
+        color: '#ffffff',
+        sounds: ['./assets/notification-sound.wav'],
+      },
+    ],
+    'expo-secure-store',
+  ],
   extra: {
     firebaseApiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
     firebaseAuthDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -40,5 +63,4 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       projectId: '612673a9-02e8-484d-a578-ce3c0f94ddcf',
     },
   },
-  plugins: ['expo-notifications', 'expo-secure-store'],
 });
