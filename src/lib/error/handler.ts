@@ -1,5 +1,3 @@
-import * as Sentry from 'sentry-expo';
-
 export const ERROR_DOMAINS = {
   NOTIFICATION: 'notification',
   USER: 'user',
