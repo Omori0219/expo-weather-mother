@@ -1,6 +1,6 @@
 import { initializeApp, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { initializeAuth, getAuth, getReactNativePersistence } from 'firebase/auth';
+import { initializeAuth, getAuth, getReactNativePersistence, Auth } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
@@ -39,7 +39,7 @@ const app = getFirebaseApp();
 export const db = getFirestore(app);
 
 // Auth初期化
-export const auth = getFirebaseAuth(app);
+export const auth: Auth = getFirebaseAuth(app);
 
 // 必要なユーティリティ関数のエクスポート
 export { getApp, getAuth };
