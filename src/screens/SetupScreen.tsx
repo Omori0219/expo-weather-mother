@@ -92,7 +92,7 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
             });
           }
         } else if (status === 'denied') {
-          // 拒否された場合は、その状態を明示的に記録
+          // 拒否された場合は、その状態を記録するのみ
           await updateNotificationSettings(user.uid, {
             permissionState: status,
             isPushNotificationEnabled: false,
@@ -101,33 +101,20 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
         }
       }
 
-      // 結果に応じたUI表示とナビゲーション
-      if (status === 'granted') {
-        stackNavigation.replace('Main');
-      } else {
-        Alert.alert('通知がオフになっています', '後から設定メニューで通知を有効にできます。', [
-          {
-            text: 'OK',
-            onPress: () => stackNavigation.replace('Main'),
-          },
-        ]);
-      }
+      // 選択結果に関わらず、そのままメイン画面へ遷移
+      stackNavigation.replace('Main');
     } catch (error) {
       console.error('通知設定エラーの詳細:', error);
 
-      // エラーの種類に応じたメッセージを表示
+      // エラーの場合のみ、ユーザーに通知
       const errorMessage = error instanceof Error ? error.message : '不明なエラーが発生しました';
 
-      Alert.alert(
-        'エラー',
-        `通知の設定中にエラーが発生しました: ${errorMessage}\n\n後から設定メニューで変更できます。`,
-        [
-          {
-            text: 'OK',
-            onPress: () => stackNavigation.replace('Main'),
-          },
-        ]
-      );
+      Alert.alert('エラー', `通知の設定中にエラーが発生しました: ${errorMessage}`, [
+        {
+          text: 'OK',
+          onPress: () => stackNavigation.replace('Main'),
+        },
+      ]);
     }
   }, [getExpoPushToken, updateNotificationSettings, stackNavigation, user]);
 
