@@ -57,7 +57,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         organization: process.env.SENTRY_ORG,
         project: process.env.SENTRY_PROJECT,
         authToken: process.env.SENTRY_AUTH_TOKEN,
-        uploadSourceMaps: true,
       },
     ],
   ],
@@ -71,9 +70,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     firebaseMeasurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
     eas: {
       projectId: '612673a9-02e8-484d-a578-ce3c0f94ddcf',
-    },
-    sentry: {
-      dsn: process.env.SENTRY_DSN,
     },
   },
   experiments: {
