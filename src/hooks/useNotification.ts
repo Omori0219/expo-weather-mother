@@ -1,11 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { useAuth } from './useAuth';
 import { saveExpoPushToken, updateNotificationSettings } from '../services/notification';
-import { NotificationError, NotificationPermissionStatus } from '../types/notification';
+import {
+  NotificationError,
+  NotificationPermissionStatus,
+  NotificationSettings,
+} from '../types/notification';
 
 // 通知の設定
 Notifications.setNotificationHandler({
@@ -24,7 +28,11 @@ export function useNotification() {
   // 通知権限の取得
   const requestPermissions = useCallback(async (): Promise<NotificationPermissionStatus> => {
     if (!Device.isDevice) {
-      throw new Error('実機以外での通知機能はサポートされていません');
+      throw {
+        code: 'device_not_supported',
+        message: '実機以外での通知機能はサポートされていません',
+        recoverable: false,
+      } as NotificationError;
     }
 
     if (Platform.OS === 'android') {
@@ -40,16 +48,24 @@ export function useNotification() {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     console.log('既存の通知許可状態:', existingStatus);
 
-    // iOS の場合、必ずシステムの許可ダイアログを表示
+    // iOS の場合の処理
     if (Platform.OS === 'ios') {
-      const { status } = await Notifications.requestPermissionsAsync();
+      // 未設定の場合のみ許可ダイアログを表示
+      if (existingStatus === 'undetermined') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        return {
+          status,
+          canAskAgain: true,
+        };
+      }
+      // 既に設定済みの場合は現在の状態を返す
       return {
-        status,
-        canAskAgain: true,
+        status: existingStatus,
+        canAskAgain: await Notifications.canAskAgain(),
       };
     }
 
-    // Android の場合は既存の権限状態を確認
+    // Android の場合の処理
     if (existingStatus !== 'granted') {
       const { status } = await Notifications.requestPermissionsAsync();
       return {
@@ -71,7 +87,11 @@ export function useNotification() {
       console.log('Project ID:', projectId);
 
       if (!projectId) {
-        throw new Error('Project ID が設定されていません');
+        throw {
+          code: 'token_error',
+          message: 'Project ID が設定されていません',
+          recoverable: false,
+        } as NotificationError;
       }
 
       const token = (
@@ -85,45 +105,44 @@ export function useNotification() {
 
       if (user?.uid) {
         await saveExpoPushToken(user.uid, token);
-        await updateNotificationSettings(user.uid, { isPushNotificationEnabled: true });
+        // 通知設定の更新は呼び出し側で行うため、ここでは行わない
       }
 
       return token;
     } catch (error) {
       console.error('Failed to get push token:', error);
-      setError({
+      const notificationError: NotificationError = {
         code: 'token_error',
         message: 'プッシュ通知トークンの取得に失敗しました',
         recoverable: true,
-      });
-      throw error;
+      };
+      setError(notificationError);
+      throw notificationError;
     }
   }, [user]);
 
   // 通知設定の更新
   const updateSettings = useCallback(
-    async (isEnabled: boolean) => {
+    async (settings: Partial<NotificationSettings>) => {
       if (!user?.uid) return;
 
       try {
         await updateNotificationSettings(user.uid, {
-          isPushNotificationEnabled: isEnabled,
+          ...settings,
+          lastUpdated: new Date(),
         });
-
-        if (isEnabled && !expoPushToken) {
-          await getExpoPushToken();
-        }
       } catch (error) {
         console.error('Failed to update notification settings:', error);
-        setError({
+        const notificationError: NotificationError = {
           code: 'settings_error',
           message: '通知設定の更新に失敗しました',
           recoverable: true,
-        });
-        throw error;
+        };
+        setError(notificationError);
+        throw notificationError;
       }
     },
-    [user, expoPushToken, getExpoPushToken]
+    [user]
   );
 
   // エラーのクリア

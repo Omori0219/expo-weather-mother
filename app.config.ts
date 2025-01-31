@@ -27,6 +27,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     infoPlist: {
       UIBackgroundModes: ['remote-notification'],
       ITSAppUsesNonExemptEncryption: false,
+      NSUserNotificationUsageDescription:
+        'お天気情報をお知らせするために通知を利用します。毎朝7時に、その日の天気予報をお届けします。',
     },
     config: {
       usesNonExemptEncryption: false,

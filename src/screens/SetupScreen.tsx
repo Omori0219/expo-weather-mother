@@ -65,35 +65,72 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
   const handleRequestNotificationPermission = useCallback(async () => {
     try {
       // 1. 通知許可をリクエスト
-      const { status } = await requestPermissions();
-      console.log('通知許可状態:', status);
+      const { status, canAskAgain } = await requestPermissions();
+      console.log('通知許可状態:', status, 'canAskAgain:', canAskAgain);
 
-      // 2. 許可された場合のみトークンを取得・保存
-      if (status === 'granted') {
-        await getExpoPushToken();
-      }
-
-      // 3. 結果に関わらずFirestoreを更新
       if (user?.uid) {
-        await updateNotificationSettings(user.uid, {
-          isPushNotificationEnabled: status === 'granted',
-        });
+        // 2. 許可状態に応じた処理
+        if (status === 'granted') {
+          try {
+            // トークンの取得
+            const token = await getExpoPushToken();
+            // Firestoreの更新
+            await updateNotificationSettings(user.uid, {
+              isPushNotificationEnabled: true,
+              permissionState: status,
+              expoPushToken: token,
+            });
+          } catch (tokenError) {
+            console.error('トークン取得エラー:', tokenError);
+            // トークン取得エラーでも、許可状態は保存
+            await updateNotificationSettings(user.uid, {
+              isPushNotificationEnabled: true,
+              permissionState: status,
+            });
+          }
+        } else if (status === 'denied') {
+          // 拒否された場合は、その状態のみを記録
+          await updateNotificationSettings(user.uid, {
+            permissionState: status,
+            isPushNotificationEnabled: null,
+          });
+        }
+        // undetermined の場合は更新しない
       }
 
-      // 4. メイン画面に遷移
-      stackNavigation.replace('Main');
+      // 3. 結果に応じたUI表示とナビゲーション
+      if (status === 'granted') {
+        stackNavigation.replace('Main');
+      } else {
+        const message = !canAskAgain
+          ? '設定アプリから通知を許可することができます。'
+          : '後から設定メニューで通知を有効にできます。';
+
+        Alert.alert('通知がオフになっています', message, [
+          {
+            text: 'OK',
+            onPress: () => stackNavigation.replace('Main'),
+          },
+        ]);
+      }
     } catch (error) {
-      // エラーの詳細をコンソールに出力
       console.error('通知設定エラーの詳細:', error);
 
-      // ユーザーにより詳細なエラー情報を表示
+      // エラーの種類に応じたメッセージを表示
+      const errorMessage = error instanceof Error ? error.message : '不明なエラーが発生しました';
+
       Alert.alert(
         'エラー',
-        `通知の設定中にエラーが発生しました: ${error instanceof Error ? error.message : '不明なエラー'}\n\n後から設定メニューで変更できます。`
+        `通知の設定中にエラーが発生しました: ${errorMessage}\n\n後から設定メニューで変更できます。`,
+        [
+          {
+            text: 'OK',
+            onPress: () => stackNavigation.replace('Main'),
+          },
+        ]
       );
-      stackNavigation.replace('Main');
     }
-  }, [requestPermissions, getExpoPushToken, stackNavigation, user]);
+  }, [requestPermissions, getExpoPushToken, updateNotificationSettings, stackNavigation, user]);
 
   // 確定ボタンの処理
   const handleConfirm = useCallback(async () => {
