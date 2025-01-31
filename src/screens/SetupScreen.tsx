@@ -23,7 +23,7 @@ export function SetupScreen() {
     try {
       const success = await saveUserData(areaCode);
       if (success) {
-        navigation.replace('Weather');
+        navigation.replace('Main');
       }
     } catch (error) {
       // エラーは useUser 内で処理されるため、ここでは何もしない
