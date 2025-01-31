@@ -34,11 +34,12 @@ export function WeatherScreen() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // 画面初期表示時のデータ読み込み
+  // 初期データ読み込み
   useEffect(() => {
     const loadInitialData = async () => {
+      if (!isInitialLoading) return;
+
       try {
-        setIsInitialLoading(true);
         await refreshCurrentWeather();
       } finally {
         setIsInitialLoading(false);
@@ -46,14 +47,13 @@ export function WeatherScreen() {
     };
 
     loadInitialData();
-  }, [refreshCurrentWeather]);
+  }, [isInitialLoading, refreshCurrentWeather]);
 
-  // 画面がフォーカスされた時のデータ更新
+  // 画面フォーカス時の更新
   useEffect(() => {
-    if (isFocused) {
-      refreshCurrentWeather();
-    }
-  }, [isFocused, refreshCurrentWeather]);
+    if (!isFocused || isInitialLoading) return;
+    refreshCurrentWeather();
+  }, [isFocused, isInitialLoading, refreshCurrentWeather]);
 
   // プルリフレッシュ時の処理
   const handleRefresh = useCallback(async () => {
@@ -73,17 +73,44 @@ export function WeatherScreen() {
     paddingTop: Platform.OS === 'android' ? insets.top : 0,
   };
 
+  // 地域未設定時の表示
+  const renderNoArea = () => (
+    <SafeAreaView style={containerStyle}>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        <View style={styles.content}>
+          <Text style={styles.placeholder}>地域が設定されていません</Text>
+          <Text style={styles.subText}>設定画面から地域を選択してください</Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+
+  // エラー表示
+  const renderError = () => <ErrorMessage message={error} onRetry={handleRefresh} />;
+
+  // 天気情報表示
+  const renderWeatherInfo = () => (
+    <WeatherInfo
+      weatherData={weatherData}
+      areaCode={userData.areaCode}
+      onRefresh={handleRefresh}
+      isRefreshing={isRefreshing}
+    />
+  );
+
+  // データなし表示
+  const renderNoData = () => <Text style={styles.placeholder}>天気情報を取得できませんでした</Text>;
+
+  // メインコンテンツの表示
+  const renderMainContent = () => {
+    if (error) return renderError();
+    if (weatherData) return renderWeatherInfo();
+    if (!isLoading) return renderNoData();
+    return null;
+  };
+
   if (!userData?.areaCode) {
-    return (
-      <SafeAreaView style={containerStyle}>
-        <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          <View style={styles.content}>
-            <Text style={styles.placeholder}>地域が設定されていません</Text>
-            <Text style={styles.subText}>設定画面から地域を選択してください</Text>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    );
+    return renderNoArea();
   }
 
   return (
@@ -98,18 +125,7 @@ export function WeatherScreen() {
         />
         <View style={styles.content}>
           <Text style={styles.areaName}>選択中の地域: {area?.areaName || '未設定'}</Text>
-          {error ? (
-            <ErrorMessage message={error} onRetry={handleRefresh} />
-          ) : weatherData ? (
-            <WeatherInfo
-              weatherData={weatherData}
-              areaCode={userData.areaCode}
-              onRefresh={handleRefresh}
-              isRefreshing={isRefreshing}
-            />
-          ) : (
-            !isLoading && <Text style={styles.placeholder}>天気情報を取得できませんでした</Text>
-          )}
+          {renderMainContent()}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -123,48 +139,27 @@ const styles = StyleSheet.create<WeatherScreenStyles>({
   },
   scrollViewContent: {
     flexGrow: 1,
+    padding: 16,
   },
   content: {
     flex: 1,
-    padding: 16,
+  },
+  areaName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
   },
   placeholder: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#666',
     textAlign: 'center',
-    marginBottom: 8,
-    ...Platform.select({
-      ios: {
-        fontWeight: '600',
-      },
-      android: {
-        fontFamily: 'sans-serif-medium',
-      },
-    }),
+    marginTop: 32,
   },
   subText: {
     fontSize: 14,
     color: '#999',
     textAlign: 'center',
-    ...Platform.select({
-      ios: {
-        fontWeight: '400',
-      },
-      android: {
-        fontFamily: 'sans-serif',
-      },
-    }),
-  },
-  areaName: {
-    fontSize: 18,
-    marginBottom: 16,
-    ...Platform.select({
-      ios: {
-        fontWeight: 'bold',
-      },
-      android: {
-        fontFamily: 'sans-serif-medium',
-      },
-    }),
+    marginTop: 8,
   },
 });
