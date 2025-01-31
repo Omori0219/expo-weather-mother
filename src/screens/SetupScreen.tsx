@@ -9,6 +9,7 @@ import {
   Platform,
   ViewStyle,
   TextStyle,
+  Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { RootStackNavigationProp, MainDrawerNavigationProp } from '../types/navigation';
@@ -25,12 +26,17 @@ type SetupScreenStyles = {
   loadingContainer: ViewStyle;
   title: TextStyle;
   scrollView: ViewStyle;
-  scrollViewContent: ViewStyle;
+  prefecturesContainer: ViewStyle;
   prefectureButton: ViewStyle;
   selectedButton: ViewStyle;
   prefectureText: TextStyle;
   selectedButtonText: TextStyle;
   error: TextStyle;
+  confirmButton: ViewStyle;
+  confirmButtonDisabled: ViewStyle;
+  confirmButtonText: TextStyle;
+  confirmButtonTextDisabled: TextStyle;
+  bottomContainer: ViewStyle;
 };
 
 export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
@@ -40,27 +46,28 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
   const { updateAreaAndWeather, isWeatherLoading, error } = useWeatherManager();
   const [selectedPrefecture, setSelectedPrefecture] = useState<string | null>(null);
 
-  // 地域選択後の処理
-  const handlePrefectureSelect = useCallback(
-    async (areaCode: string) => {
-      setSelectedPrefecture(areaCode);
-      try {
-        const success = await updateAreaAndWeather(areaCode);
-        if (success) {
-          if (isInitialSetup) {
-            // 初期設定時はメイン画面に遷移
-            stackNavigation.replace('Main');
-          } else {
-            // 地域変更時は前の画面に戻る
-            drawerNavigation.goBack();
-          }
+  // 地域選択の処理
+  const handlePrefectureSelect = useCallback((areaCode: string) => {
+    setSelectedPrefecture(areaCode);
+  }, []);
+
+  // 確定ボタンの処理
+  const handleConfirm = useCallback(async () => {
+    if (!selectedPrefecture) return;
+
+    try {
+      const success = await updateAreaAndWeather(selectedPrefecture);
+      if (success) {
+        if (isInitialSetup) {
+          stackNavigation.replace('Main');
+        } else {
+          drawerNavigation.goBack();
         }
-      } catch (error) {
-        // エラーは useWeatherManager 内で処理されるため、ここでは何もしない
       }
-    },
-    [isInitialSetup, stackNavigation, drawerNavigation, updateAreaAndWeather]
-  );
+    } catch (error) {
+      // エラーは useWeatherManager 内で処理されるため、ここでは何もしない
+    }
+  }, [selectedPrefecture, isInitialSetup, stackNavigation, drawerNavigation, updateAreaAndWeather]);
 
   const containerStyle = {
     ...styles.container,
@@ -91,26 +98,44 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
         }}
         showsVerticalScrollIndicator={false}
       >
-        {PREFECTURE_LIST.map(prefecture => (
-          <TouchableOpacity
-            key={prefecture.areaCode}
-            style={[
-              styles.prefectureButton,
-              selectedPrefecture === prefecture.areaCode && styles.selectedButton,
-            ]}
-            onPress={() => handlePrefectureSelect(prefecture.areaCode)}
-          >
-            <Text
+        <View style={styles.prefecturesContainer}>
+          {PREFECTURE_LIST.map(prefecture => (
+            <TouchableOpacity
+              key={prefecture.areaCode}
               style={[
-                styles.prefectureText,
-                selectedPrefecture === prefecture.areaCode && styles.selectedButtonText,
+                styles.prefectureButton,
+                selectedPrefecture === prefecture.areaCode && styles.selectedButton,
               ]}
+              onPress={() => handlePrefectureSelect(prefecture.areaCode)}
             >
-              {prefecture.areaName}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text
+                style={[
+                  styles.prefectureText,
+                  selectedPrefecture === prefecture.areaCode && styles.selectedButtonText,
+                ]}
+              >
+                {prefecture.areaName}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
+      <View style={styles.bottomContainer}>
+        <TouchableOpacity
+          style={[styles.confirmButton, !selectedPrefecture && styles.confirmButtonDisabled]}
+          onPress={handleConfirm}
+          disabled={!selectedPrefecture || isWeatherLoading}
+        >
+          <Text
+            style={[
+              styles.confirmButtonText,
+              !selectedPrefecture && styles.confirmButtonTextDisabled,
+            ]}
+          >
+            {isWeatherLoading ? '更新中...' : '決定'}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -142,19 +167,23 @@ const styles = StyleSheet.create<SetupScreenStyles>({
   scrollView: {
     flex: 1,
   },
-  scrollViewContent: {
-    paddingHorizontal: 16,
+  prefecturesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    gap: 8,
   },
   prefectureButton: {
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 16,
     backgroundColor: '#f5f5f5',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.1,
         shadowRadius: 2,
       },
       android: {
@@ -166,7 +195,8 @@ const styles = StyleSheet.create<SetupScreenStyles>({
     backgroundColor: '#007AFF',
   },
   prefectureText: {
-    fontSize: 16,
+    fontSize: 14,
+    color: '#333',
     ...Platform.select({
       ios: {
         fontWeight: '400',
@@ -200,5 +230,46 @@ const styles = StyleSheet.create<SetupScreenStyles>({
         fontFamily: 'sans-serif',
       },
     }),
+  },
+  bottomContainer: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+  },
+  confirmButton: {
+    backgroundColor: '#007AFF',
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  confirmButtonDisabled: {
+    backgroundColor: '#ccc',
+  },
+  confirmButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    ...Platform.select({
+      ios: {
+        fontWeight: '600',
+      },
+      android: {
+        fontFamily: 'sans-serif-medium',
+      },
+    }),
+  },
+  confirmButtonTextDisabled: {
+    color: '#999',
   },
 });
