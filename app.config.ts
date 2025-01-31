@@ -62,4 +62,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       projectId: '612673a9-02e8-484d-a578-ce3c0f94ddcf',
     },
   },
+  experiments: {
+    tsconfigPaths: true,
+  },
 });
