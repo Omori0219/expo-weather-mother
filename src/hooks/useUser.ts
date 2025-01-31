@@ -42,8 +42,11 @@ export function useUser() {
 
       const data = userDoc.data() as UserDocument;
       const userData: UserData = {
+        userId: data.userId,
         areaCode: data.areaCode,
+        preferredPushNotificationTime: data.preferredPushNotificationTime,
         createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
       };
 
       setUserData(userData);
@@ -74,16 +77,21 @@ export function useUser() {
       setIsLoading(true);
       setError(null);
 
+      const now = Timestamp.now();
       const userData: UserDocument = {
+        userId: user.uid,
         areaCode,
-        createdAt: Timestamp.now(),
+        createdAt: now,
+        updatedAt: now,
       };
 
       await setDoc(doc(db, 'users', user.uid), userData);
 
       setUserData({
+        userId: user.uid,
         areaCode,
-        createdAt: userData.createdAt.toDate(),
+        createdAt: now.toDate(),
+        updatedAt: now.toDate(),
       });
 
       return true;
