@@ -1,14 +1,14 @@
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 
 interface ErrorMessageProps {
-  message: string;
+  message: string | null;
   onRetry?: () => void;
 }
 
 export function ErrorMessage({ message, onRetry }: ErrorMessageProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.message}>{message}</Text>
+      <Text style={styles.message}>{message || 'エラーが発生しました'}</Text>
       {onRetry && (
         <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
           <Text style={styles.retryText}>再試行</Text>
