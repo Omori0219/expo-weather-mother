@@ -19,7 +19,7 @@ import { useWeatherManager } from '../hooks/useWeatherManager';
 import { useNotification } from '../hooks/useNotification';
 import { useAuth } from '../hooks/useAuth';
 import { updateNotificationSettings } from '../services/notification';
-import { PREFECTURE_LIST } from '../constants/prefectures';
+import { AREAS } from '../constants/areas';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ERROR_DOMAINS, createError, handleError } from '../lib/error/handler';
 import type { NotificationPermissionState } from '../types/notification';
@@ -183,22 +183,22 @@ export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.prefecturesContainer}>
-          {PREFECTURE_LIST.map(prefecture => (
+          {AREAS.map(area => (
             <TouchableOpacity
-              key={prefecture.areaCode}
+              key={area.areaCode}
               style={[
                 styles.prefectureButton,
-                selectedPrefecture === prefecture.areaCode && styles.selectedButton,
+                selectedPrefecture === area.areaCode && styles.selectedButton,
               ]}
-              onPress={() => handlePrefectureSelect(prefecture.areaCode)}
+              onPress={() => handlePrefectureSelect(area.areaCode)}
             >
               <Text
                 style={[
                   styles.prefectureText,
-                  selectedPrefecture === prefecture.areaCode && styles.selectedButtonText,
+                  selectedPrefecture === area.areaCode && styles.selectedButtonText,
                 ]}
               >
-                {prefecture.areaName}
+                {area.areaName}
               </Text>
             </TouchableOpacity>
           ))}

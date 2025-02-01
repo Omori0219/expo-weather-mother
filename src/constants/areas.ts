@@ -1,5 +1,7 @@
 import { AreaData } from '../types/user';
 
+// 気象庁の一次細分区域コードに基づく地域データ
+// 参考: https://www.jma.go.jp/jma/kishou/know/yougo_hp/chiiki.html
 export const AREAS: AreaData[] = [
   { areaCode: '016000', areaName: '北海道' },
   { areaCode: '020000', areaName: '青森県' },
