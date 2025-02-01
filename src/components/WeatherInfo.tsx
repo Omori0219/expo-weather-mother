@@ -3,7 +3,7 @@ import type { WeatherData } from '../types/weather';
 import { AREAS } from '../constants/areas';
 
 interface WeatherInfoProps {
-  weatherData: WeatherData;
+  weatherData: WeatherData | null;
   areaCode: string;
   onRefresh?: () => void;
   isRefreshing?: boolean;
@@ -15,6 +15,8 @@ export function WeatherInfo({
   onRefresh,
   isRefreshing = false,
 }: WeatherInfoProps) {
+  if (!weatherData) return null;
+
   const area = AREAS.find(a => a.areaCode === areaCode);
   const formattedDate = new Date(
     weatherData.date.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')
@@ -57,13 +59,13 @@ const styles = StyleSheet.create({
   header: {
     padding: 16,
     backgroundColor: '#f8f8f8',
-    borderRadius: 8,
-    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   areaName: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 4,
+    marginBottom: 8,
   },
   date: {
     fontSize: 14,
@@ -71,9 +73,6 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     padding: 16,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    marginBottom: 16,
   },
   message: {
     fontSize: 16,
