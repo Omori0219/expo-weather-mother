@@ -24,4 +24,5 @@ export interface WeatherData {
   message: string;
   date: string;
   areaName: string;
+  createdAt: Timestamp;
 }
