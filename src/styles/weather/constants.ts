@@ -11,8 +11,8 @@ export const TYPOGRAPHY = {
     FONT_WEIGHT: 'bold',
   },
   AREA: {
-    SIZE: 64,
-    LINE_HEIGHT: 64,
+    SIZE: 56,
+    LINE_HEIGHT: 56,
     FONT_WEIGHT: 'bold',
   },
   MESSAGE: {

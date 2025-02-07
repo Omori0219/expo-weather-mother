@@ -16,9 +16,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    width: '100%',
+    width: '90%',
     height: undefined,
-    aspectRatio: 1, // 画像のアスペクト比に合わせて調整が必要かもしれません
+    aspectRatio: 1.075, // 実際の画像サイズ（W:402, H:374）に基づく比率
     resizeMode: 'contain',
   },
 });

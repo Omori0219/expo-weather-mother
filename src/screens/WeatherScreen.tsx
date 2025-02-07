@@ -17,7 +17,8 @@ type WeatherScreenStyles = {
   content: ViewStyle;
   header: ViewStyle;
   weatherMessageContainer: ViewStyle;
-  footer: ViewStyle;
+  // footer: ViewStyle;
+  motherCharacterContainer: ViewStyle;
 };
 
 export function WeatherScreen() {
@@ -73,9 +74,9 @@ export function WeatherScreen() {
           <SafeAreaView />
           <DateDisplay date={new Date(weatherData.date)} />
           <AreaDisplay areaName={weatherData.areaName} />
-        </View>
-        <View style={styles.weatherMessageContainer}>
           <WeatherMessage message={weatherData.message} />
+        </View>
+        <View style={styles.motherCharacterContainer}>
           <MotherCharacter />
         </View>
       </View>
@@ -93,22 +94,15 @@ const styles = StyleSheet.create<WeatherScreenStyles>({
     // backgroundColor: 'blue',
   },
   header: {
-    flex: 1,
-    marginTop: 0,
-    marginLeft: 20,
     alignItems: 'flex-start',
-    marginBottom: 20,
     gap: 8,
+    paddingHorizontal: 20,
   },
-  weatherMessageContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: -12,
-  },
-  footer: {
-    flex: 1,
-    // backgroundColor: 'red',
-    justifyContent: 'flex-end',
+  weatherMessageContainer: {},
+  motherCharacterContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: -100,
   },
 });
