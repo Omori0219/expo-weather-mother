@@ -1,7 +1,7 @@
-import { StyleSheet, View, Text, Image, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, Text, useWindowDimensions } from 'react-native';
 import { COLORS, TYPOGRAPHY } from '../../../styles/weather/constants';
 import { useCustomFonts } from '../../../hooks/useCustomFonts';
-
+import { Image } from 'expo-image';
 interface SpeechBubbleProps {
   message: string;
 }
@@ -22,6 +22,7 @@ export function SpeechBubble({ message }: SpeechBubbleProps) {
       <Image
         source={require('../../../../assets/app/img-speech-bubble.webp')}
         style={[styles.bubble, { height: bubbleHeight }]}
+        contentFit="contain"
       />
       <View style={styles.messageContainer}>
         <Text style={[styles.message, { fontFamily: fonts.yujiSyuku }]}>{message}</Text>
