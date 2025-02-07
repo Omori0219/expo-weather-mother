@@ -1,7 +1,7 @@
-import { StyleSheet, View, Platform, ViewStyle, TextStyle } from 'react-native';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { StyleSheet, View, Platform, ViewStyle } from 'react-native';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { ErrorMessage } from '../components/ErrorMessage';
-import { useState, useEffect, useCallback } from 'react';
 import { AREAS } from '../constants/areas';
 import { useIsFocused } from '@react-navigation/native';
 import { useWeatherManager } from '../hooks/useWeatherManager';
@@ -11,15 +11,10 @@ import { DateDisplay } from '../components/weather/DateDisplay';
 import { AreaDisplay } from '../components/weather/AreaDisplay';
 import { WeatherMessage } from '../components/weather/WeatherMessage';
 import { MotherCharacter } from '../components/weather/MotherCharacter';
+import { preloadWeatherAssets } from '../utils/preloadAssets';
 
-type WeatherScreenStyles = {
-  container: ViewStyle;
-  content: ViewStyle;
-  header: ViewStyle;
-  weatherMessageContainer: ViewStyle;
-  // footer: ViewStyle;
-  motherCharacterContainer: ViewStyle;
-};
+// 天気データの更新間隔（5分 = 300000ミリ秒）
+const WEATHER_UPDATE_INTERVAL = 300000;
 
 export function WeatherScreen() {
   const isFocused = useIsFocused();
@@ -27,6 +22,20 @@ export function WeatherScreen() {
   const { userData, weatherData, isWeatherLoading, error, refreshCurrentWeather } =
     useWeatherManager();
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isAssetsLoaded, setIsAssetsLoaded] = useState(false);
+
+  // 最後の更新時刻を追跡
+  const lastUpdateRef = useRef<number>(0);
+
+  // アセットのプリロード
+  useEffect(() => {
+    const loadAssets = async () => {
+      const success = await preloadWeatherAssets();
+      setIsAssetsLoaded(success);
+    };
+
+    loadAssets();
+  }, []);
 
   // 初期データ読み込み
   useEffect(() => {
@@ -34,7 +43,9 @@ export function WeatherScreen() {
       if (!isInitialLoading) return;
 
       try {
+        // 天気データの取得
         await refreshCurrentWeather();
+        lastUpdateRef.current = Date.now();
       } finally {
         setIsInitialLoading(false);
       }
@@ -43,13 +54,25 @@ export function WeatherScreen() {
     loadInitialData();
   }, [isInitialLoading, refreshCurrentWeather]);
 
-  // 画面フォーカス時の更新
+  // 画面フォーカス時の更新（一定時間経過後のみ）
   useEffect(() => {
-    if (!isFocused || isInitialLoading) return;
-    refreshCurrentWeather();
+    const shouldUpdate = () => {
+      const now = Date.now();
+      return now - lastUpdateRef.current >= WEATHER_UPDATE_INTERVAL;
+    };
+
+    const updateIfNeeded = async () => {
+      if (isFocused && !isInitialLoading && shouldUpdate()) {
+        await refreshCurrentWeather();
+        lastUpdateRef.current = Date.now();
+      }
+    };
+
+    updateIfNeeded();
   }, [isFocused, isInitialLoading, refreshCurrentWeather]);
 
-  const isLoading = isInitialLoading || isWeatherLoading;
+  // ローディング状態の更新
+  const isLoading = isInitialLoading || isWeatherLoading || !isAssetsLoaded;
   const area = userData?.areaCode ? AREAS.find(a => a.areaCode === userData.areaCode) : null;
 
   if (isLoading) {
@@ -84,14 +107,13 @@ export function WeatherScreen() {
   );
 }
 
-const styles = StyleSheet.create<WeatherScreenStyles>({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   content: {
     flex: 1,
     padding: 0,
-    // backgroundColor: 'blue',
   },
   header: {
     alignItems: 'flex-start',

@@ -23,6 +23,9 @@ export function SpeechBubble({ message }: SpeechBubbleProps) {
         source={require('../../../../assets/app/img-speech-bubble.webp')}
         style={[styles.bubble, { height: bubbleHeight }]}
         contentFit="contain"
+        cachePolicy="memory-disk"
+        transition={300}
+        priority="normal"
       />
       <View style={styles.messageContainer}>
         <Text style={[styles.message, { fontFamily: fonts.yujiSyuku }]}>{message}</Text>

@@ -8,7 +8,10 @@ export function Background() {
       <Image
         source={require('../../../assets/app/img-japan-map.webp')}
         style={styles.map}
-        contentFit="contain" // resizeModeの代わりにcontentFitを使用
+        contentFit="contain"
+        cachePolicy="memory-disk"
+        transition={300}
+        priority="high"
       />
     </View>
   );

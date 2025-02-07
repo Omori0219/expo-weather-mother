@@ -8,6 +8,9 @@ export function MotherCharacter() {
         source={require('../../../assets/app/img-home-screen-mother.webp')}
         style={styles.image}
         contentFit="contain"
+        cachePolicy="memory-disk"
+        transition={300}
+        priority="high"
       />
     </View>
   );
