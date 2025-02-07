@@ -7,79 +7,26 @@ import {
   ScrollView,
   ActivityIndicator,
   Platform,
+  ViewStyle,
+  TextStyle,
   Alert,
 } from 'react-native';
-import * as Notifications from 'expo-notifications';
 import { useNavigation } from '@react-navigation/native';
-import type { RootStackNavigationProp } from '../types/navigation';
-import { useWeatherManager } from '../hooks/useWeatherManager';
-import { useNotification } from '../hooks/useNotification';
-import { useAuth } from '../hooks/useAuth';
-import { updateNotificationSettings } from '../services/notification';
-import { AREAS } from '../constants/areas';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ERROR_DOMAINS, createError, handleError } from '../lib/error/handler';
-import type { NotificationPermissionState } from '../types/notification';
+import { useWeatherManager } from '../hooks/useWeatherManager';
+import { AREAS } from '../constants/areas';
+import { ERROR_DOMAINS, handleError } from '../lib/error/handler';
+import type { MainTabNavigationProp } from '../types/navigation';
 
-export function SetupScreen() {
-  const navigation = useNavigation<RootStackNavigationProp>();
+export function AreaSelectionScreen() {
+  const navigation = useNavigation<MainTabNavigationProp>();
   const insets = useSafeAreaInsets();
   const { updateAreaAndWeather, isWeatherLoading, error: weatherError } = useWeatherManager();
-  const { requestPermissions, getExpoPushToken } = useNotification();
-  const { user } = useAuth();
   const [selectedPrefecture, setSelectedPrefecture] = useState<string | null>(null);
-  const [step, setStep] = useState<'prefecture' | 'notification'>('prefecture');
 
   const handlePrefectureSelect = useCallback((areaCode: string) => {
     setSelectedPrefecture(areaCode);
   }, []);
-
-  const saveNotificationSettings = useCallback(
-    async (status: NotificationPermissionState, token?: string) => {
-      if (!user?.uid) return;
-
-      try {
-        await updateNotificationSettings(user.uid, {
-          isPushNotificationEnabled: status === 'granted',
-          permissionState: status,
-          ...(token && { expoPushToken: token }),
-          lastUpdated: new Date(),
-        });
-      } catch (error) {
-        const message = handleError(error, ERROR_DOMAINS.SETUP);
-        throw createError(message, 'settings_save_error', ERROR_DOMAINS.SETUP);
-      }
-    },
-    [user]
-  );
-
-  const handleRequestNotificationPermission = useCallback(async () => {
-    try {
-      const { status } = await requestPermissions();
-
-      if (status === 'granted') {
-        try {
-          const token = await getExpoPushToken();
-          await saveNotificationSettings(status, token);
-        } catch (tokenError) {
-          console.error('トークン取得エラー:', tokenError);
-          await saveNotificationSettings(status);
-        }
-      } else {
-        await saveNotificationSettings(status);
-      }
-
-      navigation.replace('Main');
-    } catch (error) {
-      const message = handleError(error, ERROR_DOMAINS.SETUP);
-      Alert.alert('エラー', `通知の設定中にエラーが発生しました: ${message}`, [
-        {
-          text: 'OK',
-          onPress: () => navigation.replace('Main'),
-        },
-      ]);
-    }
-  }, [requestPermissions, getExpoPushToken, saveNotificationSettings, navigation]);
 
   const handleConfirm = useCallback(async () => {
     if (!selectedPrefecture) return;
@@ -87,13 +34,13 @@ export function SetupScreen() {
     try {
       const success = await updateAreaAndWeather(selectedPrefecture);
       if (success) {
-        setStep('notification');
+        navigation.goBack();
       }
     } catch (error) {
       const message = handleError(error, ERROR_DOMAINS.SETUP);
       Alert.alert('エラー', message);
     }
-  }, [selectedPrefecture, updateAreaAndWeather]);
+  }, [selectedPrefecture, navigation, updateAreaAndWeather]);
 
   const containerStyle = {
     ...styles.container,
@@ -110,31 +57,9 @@ export function SetupScreen() {
     );
   }
 
-  if (step === 'notification') {
-    return (
-      <SafeAreaView style={containerStyle}>
-        <View style={styles.notificationContainer}>
-          <Text style={styles.title}>通知の設定</Text>
-          <Text style={styles.description}>
-            毎朝7時に、お母さんからの天気予報メッセージを受け取るには、通知をオンにしてください。
-          </Text>
-          <Text style={styles.benefit}>通知をオンにすると、雨の日も傘を忘れない！</Text>
-          <View style={styles.bottomContainer}>
-            <TouchableOpacity
-              style={styles.confirmButton}
-              onPress={handleRequestNotificationPermission}
-            >
-              <Text style={styles.confirmButtonText}>通知を許可する</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView style={containerStyle}>
-      <Text style={styles.title}>お住まいの地域を選択してください</Text>
+      <Text style={styles.title}>地域を変更</Text>
       {weatherError && <Text style={styles.error}>{weatherError}</Text>}
       <ScrollView
         style={styles.scrollView}
@@ -232,23 +157,6 @@ const styles = StyleSheet.create({
     color: '#DE0613',
     textAlign: 'center',
     marginBottom: 16,
-  },
-  notificationContainer: {
-    flex: 1,
-    padding: 16,
-  },
-  description: {
-    fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  benefit: {
-    fontSize: 18,
-    color: '#DE0613',
-    textAlign: 'center',
-    marginBottom: 32,
-    fontWeight: 'bold',
   },
   bottomContainer: {
     padding: 16,
