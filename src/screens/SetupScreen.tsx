@@ -87,6 +87,7 @@ export function SetupScreen() {
     try {
       const success = await updateAreaAndWeather(selectedPrefecture);
       if (success) {
+        // 初期設定フローなので、必ず通知設定に進む
         setStep('notification');
       }
     } catch (error) {
