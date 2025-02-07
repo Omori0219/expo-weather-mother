@@ -16,6 +16,7 @@ type WeatherScreenStyles = {
   container: ViewStyle;
   content: ViewStyle;
   header: ViewStyle;
+  weatherMessageContainer: ViewStyle;
   footer: ViewStyle;
 };
 
@@ -65,19 +66,22 @@ export function WeatherScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <Background />
       <View style={[styles.content, { paddingTop: Platform.OS === 'android' ? insets.top : 0 }]}>
         <View style={styles.header}>
+          <SafeAreaView />
           <DateDisplay date={new Date(weatherData.date)} />
           <AreaDisplay areaName={weatherData.areaName} />
         </View>
-        <WeatherMessage message={weatherData.message} />
+        <View style={styles.weatherMessageContainer}>
+          <WeatherMessage message={weatherData.message} />
+        </View>
         <View style={styles.footer}>
           <MotherCharacter />
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -87,14 +91,25 @@ const styles = StyleSheet.create<WeatherScreenStyles>({
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: 0,
+    // backgroundColor: 'blue',
   },
   header: {
-    alignItems: 'center',
+    flex: 1,
+    marginTop: 0,
+    marginLeft: 20,
+    alignItems: 'flex-start',
     marginBottom: 20,
+    gap: 8,
+  },
+  weatherMessageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   footer: {
     flex: 1,
+    // backgroundColor: 'red',
     justifyContent: 'flex-end',
   },
 });

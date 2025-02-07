@@ -7,7 +7,7 @@ export const COLORS = {
 export const TYPOGRAPHY = {
   DATE: {
     SIZE: 16,
-    LINE_HEIGHT: 12,
+    LINE_HEIGHT: 16,
     FONT_WEIGHT: 'bold',
   },
   AREA: {
