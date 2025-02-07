@@ -1,7 +1,7 @@
-import { StyleSheet, View, Platform, ViewStyle, TextStyle } from 'react-native';
+import { StyleSheet, View, Platform, ViewStyle } from 'react-native';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { ErrorMessage } from '../components/ErrorMessage';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { AREAS } from '../constants/areas';
 import { useIsFocused } from '@react-navigation/native';
 import { useWeatherManager } from '../hooks/useWeatherManager';
@@ -17,7 +17,6 @@ type WeatherScreenStyles = {
   content: ViewStyle;
   header: ViewStyle;
   weatherMessageContainer: ViewStyle;
-  // footer: ViewStyle;
   motherCharacterContainer: ViewStyle;
 };
 
@@ -43,10 +42,11 @@ export function WeatherScreen() {
     loadInitialData();
   }, [isInitialLoading, refreshCurrentWeather]);
 
-  // 画面フォーカス時の更新
+  // フォーカス時は静かに更新
   useEffect(() => {
-    if (!isFocused || isInitialLoading) return;
-    refreshCurrentWeather();
+    if (isFocused && !isInitialLoading) {
+      refreshCurrentWeather({ silent: true });
+    }
   }, [isFocused, isInitialLoading, refreshCurrentWeather]);
 
   const isLoading = isInitialLoading || isWeatherLoading;
@@ -57,12 +57,15 @@ export function WeatherScreen() {
   }
 
   if (error) {
-    return <ErrorMessage message={error} onRetry={refreshCurrentWeather} />;
+    return <ErrorMessage message={error} onRetry={() => refreshCurrentWeather()} />;
   }
 
   if (!weatherData || !userData?.areaCode) {
     return (
-      <ErrorMessage message="天気情報を取得できませんでした" onRetry={refreshCurrentWeather} />
+      <ErrorMessage
+        message="天気情報を取得できませんでした"
+        onRetry={() => refreshCurrentWeather()}
+      />
     );
   }
 
@@ -91,7 +94,6 @@ const styles = StyleSheet.create<WeatherScreenStyles>({
   content: {
     flex: 1,
     padding: 0,
-    // backgroundColor: 'blue',
   },
   header: {
     alignItems: 'flex-start',

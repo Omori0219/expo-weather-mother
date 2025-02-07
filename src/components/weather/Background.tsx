@@ -1,8 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 import { Image } from 'expo-image';
 import { COLORS } from '../../styles/weather/constants';
+import { memo } from 'react';
 
-export function Background() {
+export const Background = memo(() => {
   return (
     <View style={styles.container}>
       <Image
@@ -12,7 +13,7 @@ export function Background() {
       />
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

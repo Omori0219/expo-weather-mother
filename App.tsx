@@ -9,6 +9,7 @@ import { StyleSheet, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
 import Constants from 'expo-constants';
+import { Image } from 'expo-image';
 
 // デバッグ: スプラッシュ画面の設定を確認
 console.log('Splash Screen Config:', {
@@ -16,6 +17,13 @@ console.log('Splash Screen Config:', {
   splash: Constants.expoConfig?.splash,
   assets: Constants.manifest?.assets,
 });
+
+// プリロードする画像の定義
+const PRELOAD_IMAGES = [
+  require('./assets/app/img-home-screen-mother.webp'),
+  require('./assets/app/img-japan-map.webp'),
+  require('./assets/app/img-speech-bubble.webp'),
+] as const;
 
 // スプラッシュ画面を自動で隠さないようにする
 SplashScreen.preventAutoHideAsync()
@@ -38,16 +46,21 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
-        // デバッグ用のログ出力
-        console.log('Environment variables:', {
-          skipSetup: Constants.expoConfig?.extra?.skipSetup,
-          defaultArea: Constants.expoConfig?.extra?.defaultArea,
-        });
-        // 必要な初期化処理をここに記述
-        // 例: フォントのロード、初期データの取得など
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      } catch (e) {
-        console.warn(e);
+        // 並行して実行
+        await Promise.all([
+          // 画像のプリロード
+          Promise.all(
+            PRELOAD_IMAGES.map(image => {
+              console.log('Preloading image:', image);
+              return Image.prefetch(image);
+            })
+          ),
+          // 必要な初期化処理をここに記述
+          // 例: フォントのロード、初期データの取得など
+          new Promise(resolve => setTimeout(resolve, 2000)),
+        ]);
+      } catch (error) {
+        console.warn('Asset preloading failed:', error);
       } finally {
         setAppIsReady(true);
       }
