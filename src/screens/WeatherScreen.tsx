@@ -94,8 +94,15 @@ export function WeatherScreen() {
 
     return (
       <WeatherInfo
-        weatherData={weatherData}
-        areaCode={userData.areaCode}
+        weatherDisplayData={
+          weatherData
+            ? {
+                motherMessage: weatherData.message,
+                displayDate: weatherData.date,
+                areaName: weatherData.areaName,
+              }
+            : null
+        }
         onRefresh={handleRefresh}
         isRefreshing={isRefreshing}
       />
