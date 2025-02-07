@@ -10,6 +10,7 @@ import { NotificationSettingsScreen } from '../screens/NotificationSettingsScree
 import { OthersStack } from './OthersStack';
 import { Ionicons } from '@expo/vector-icons';
 import type { MainTabParamList } from '../types/navigation';
+import { AreaSelectionScreen } from '../screens/AreaSelectionScreen';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -56,7 +57,7 @@ const TAB_SCREENS = [
   },
   {
     name: 'AreaSelect' as const,
-    component: () => <SetupScreen isInitialSetup={false} />,
+    component: AreaSelectionScreen,
     options: {
       title: '地域',
       tabBarIcon: ({ color }: { color: string; size: number }) => (
