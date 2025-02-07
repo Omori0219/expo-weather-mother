@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
+import Constants from 'expo-constants';
 
 // スプラッシュ画面を自動で隠さないようにする
 SplashScreen.preventAutoHideAsync();
@@ -47,12 +48,24 @@ export default function App() {
     return null;
   }
 
+  const initialState = Constants.expoConfig?.extra?.skipSetup
+    ? {
+        selectedArea: Constants.expoConfig?.extra?.defaultArea || '170000',
+        notificationEnabled: true,
+        isInitialSetupComplete: true,
+      }
+    : {
+        selectedArea: null,
+        notificationEnabled: false,
+        isInitialSetupComplete: false,
+      };
+
   return (
     <GestureHandlerRootView style={styles.container}>
       <View style={styles.container} onLayout={onLayoutRootView}>
         <SafeAreaProvider>
           <StatusBar style="auto" />
-          <AuthProvider>
+          <AuthProvider initialState={initialState}>
             <NavigationContainer>
               <RootStack />
             </NavigationContainer>

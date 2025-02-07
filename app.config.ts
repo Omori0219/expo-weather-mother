@@ -57,8 +57,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     firebaseAppId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
     firebaseMeasurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
     eas: {
-      projectId: '612673a9-02e8-484d-a578-ce3c0f94ddcf',
+      projectId: process.env.PROJECT_ID,
     },
+    skipSetup: process.env.EXPO_SKIP_SETUP === 'true',
+    defaultArea: process.env.EXPO_DEFAULT_AREA || null,
   },
   experiments: {
     tsconfigPaths: true,
