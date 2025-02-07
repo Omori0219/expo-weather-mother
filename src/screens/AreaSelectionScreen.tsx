@@ -21,8 +21,15 @@ import type { MainTabNavigationProp } from '../types/navigation';
 export function AreaSelectionScreen() {
   const navigation = useNavigation<MainTabNavigationProp>();
   const insets = useSafeAreaInsets();
-  const { updateAreaAndWeather, isWeatherLoading, error: weatherError } = useWeatherManager();
-  const [selectedPrefecture, setSelectedPrefecture] = useState<string | null>(null);
+  const {
+    updateAreaAndWeather,
+    isWeatherLoading,
+    error: weatherError,
+    userData,
+  } = useWeatherManager();
+  const [selectedPrefecture, setSelectedPrefecture] = useState<string | null>(
+    userData?.areaCode || null
+  );
 
   const handlePrefectureSelect = useCallback((areaCode: string) => {
     setSelectedPrefecture(areaCode);
@@ -60,6 +67,11 @@ export function AreaSelectionScreen() {
   return (
     <SafeAreaView style={containerStyle}>
       <Text style={styles.title}>地域を変更</Text>
+      {userData?.areaCode && (
+        <Text style={styles.currentArea}>
+          現在の地域：{AREAS.find(a => a.areaCode === userData.areaCode)?.areaName}
+        </Text>
+      )}
       {weatherError && <Text style={styles.error}>{weatherError}</Text>}
       <ScrollView
         style={styles.scrollView}
@@ -180,5 +192,11 @@ const styles = StyleSheet.create({
   },
   confirmButtonTextDisabled: {
     color: '#fff',
+  },
+  currentArea: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 16,
   },
 });
