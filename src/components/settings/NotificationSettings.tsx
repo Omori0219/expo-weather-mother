@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { NotificationSwitch } from './NotificationSwitch';
 import { Ionicons } from '@expo/vector-icons';
 
 export function NotificationSettings() {
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <Ionicons name="notifications-outline" size={32} color="#DE0613" />
         <Text style={styles.headerTitle}>通知設定</Text>
@@ -22,7 +22,7 @@ export function NotificationSettings() {
           通知をオフにすると、お母さんからの天気予報メッセージを受け取ることができなくなります。
         </Text>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
