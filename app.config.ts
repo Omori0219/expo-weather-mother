@@ -15,6 +15,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         image: './assets/logo.png',
         backgroundColor: '#7EC8D4',
         imageWidth: 200,
+        resizeMode: 'contain',
       },
     ],
     [
@@ -22,7 +23,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         icon: './assets/notification-icon.png',
         color: '#ffffff',
-        sounds: ['./assets/notification-sound.wav'],
       },
     ],
     'expo-secure-store',
@@ -58,7 +58,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     firebaseAppId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
     firebaseMeasurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
     eas: {
-      projectId: process.env.PROJECT_ID,
+      projectId: '612673a9-02e8-484d-a578-ce3c0f94ddcf',
     },
     skipSetup: process.env.EXPO_SKIP_SETUP === 'true',
     defaultArea: process.env.EXPO_DEFAULT_AREA || null,
