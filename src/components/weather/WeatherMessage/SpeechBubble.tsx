@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Image } from 'react-native';
+import { StyleSheet, View, Text, Image, useWindowDimensions } from 'react-native';
 import { COLORS, TYPOGRAPHY } from '../../../styles/weather/constants';
 
 interface SpeechBubbleProps {
@@ -6,13 +6,19 @@ interface SpeechBubbleProps {
 }
 
 export function SpeechBubble({ message }: SpeechBubbleProps) {
+  const { width: screenWidth } = useWindowDimensions();
+  const SPEECH_BUBBLE_ASPECT_RATIO = 1.2;
+  const bubbleHeight = (screenWidth * 0.95) / SPEECH_BUBBLE_ASPECT_RATIO;
+
   return (
     <View style={styles.container}>
       <Image
         source={require('../../../../assets/app/img-speech-bubble.png')}
-        style={styles.bubble}
+        style={[styles.bubble, { height: bubbleHeight }]}
       />
-      <Text style={styles.message}>{message}</Text>
+      <View style={styles.messageContainer}>
+        <Text style={styles.message}>{message}</Text>
+      </View>
     </View>
   );
 }
@@ -20,18 +26,24 @@ export function SpeechBubble({ message }: SpeechBubbleProps) {
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
+    width: '100%',
   },
   bubble: {
     width: '100%',
-    height: undefined,
-    aspectRatio: 1.5, // 画像のアスペクト比に合わせて調整が必要かもしれません
     resizeMode: 'contain',
   },
-  message: {
+  messageContainer: {
     position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -50 }, { translateY: -50 }],
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: '15%', // メッセージのパディング
+    paddingVertical: '10%',
+  },
+  message: {
     color: COLORS.TEXT_BLACK,
     fontSize: TYPOGRAPHY.MESSAGE.SIZE,
     lineHeight: TYPOGRAPHY.MESSAGE.LINE_HEIGHT,
