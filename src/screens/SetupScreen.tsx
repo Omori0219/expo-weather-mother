@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useNavigation } from '@react-navigation/native';
-import type { RootStackNavigationProp, MainDrawerNavigationProp } from '../types/navigation';
+import type { RootStackNavigationProp, MainTabNavigationProp } from '../types/navigation';
 import { useWeatherManager } from '../hooks/useWeatherManager';
 import { useNotification } from '../hooks/useNotification';
 import { useAuth } from '../hooks/useAuth';
@@ -51,7 +51,7 @@ type SetupScreenStyles = {
 
 export function SetupScreen({ isInitialSetup = false }: SetupScreenProps) {
   const stackNavigation = useNavigation<RootStackNavigationProp>();
-  const drawerNavigation = useNavigation<MainDrawerNavigationProp>();
+  const drawerNavigation = useNavigation<MainTabNavigationProp>();
   const insets = useSafeAreaInsets();
   const { updateAreaAndWeather, isWeatherLoading, error: weatherError } = useWeatherManager();
   const { requestPermissions, getExpoPushToken } = useNotification();

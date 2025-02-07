@@ -1,20 +1,22 @@
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { DrawerNavigationProp } from '@react-navigation/drawer';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
 // Stack Navigation
 export type RootStackParamList = {
   Setup: undefined;
   Main: undefined;
-};
-
-export type RootStackNavigationProp = NativeStackNavigationProp<RootStackParamList>;
-
-// Drawer Navigation
-export type MainDrawerParamList = {
-  Weather: undefined;
-  AreaSelect: undefined;
   Terms: undefined;
   PrivacyPolicy: undefined;
 };
 
-export type MainDrawerNavigationProp = DrawerNavigationProp<MainDrawerParamList>;
+export type RootStackNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+// Bottom Tab Navigation
+export type MainTabParamList = {
+  Weather: undefined;
+  AreaSelect: undefined;
+  Settings: undefined;
+  Others: undefined;
+};
+
+export type MainTabNavigationProp = BottomTabNavigationProp<MainTabParamList>;
