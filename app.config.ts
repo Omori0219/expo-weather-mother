@@ -2,7 +2,7 @@ import { ExpoConfig, ConfigContext } from 'expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: 'お天気おかん',
+  name: 'お天気かあさん',
   slug: 'weather-mother',
   version: '1.0.0',
   orientation: 'portrait',
