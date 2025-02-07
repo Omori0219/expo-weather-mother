@@ -4,7 +4,7 @@ export function MotherCharacter() {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../../assets/app/img-home-screen-mother.png')}
+        source={require('../../../assets/app/img-home-screen-mother.webp')}
         style={styles.image}
       />
     </View>
