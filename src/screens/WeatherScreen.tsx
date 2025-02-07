@@ -76,8 +76,6 @@ export function WeatherScreen() {
         </View>
         <View style={styles.weatherMessageContainer}>
           <WeatherMessage message={weatherData.message} />
-        </View>
-        <View style={styles.footer}>
           <MotherCharacter />
         </View>
       </View>
@@ -106,6 +104,7 @@ const styles = StyleSheet.create<WeatherScreenStyles>({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: -12,
   },
   footer: {
     flex: 1,
