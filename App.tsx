@@ -10,8 +10,21 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
 import Constants from 'expo-constants';
 
+// デバッグ: スプラッシュ画面の設定を確認
+console.log('Splash Screen Config:', {
+  plugins: Constants.expoConfig?.plugins,
+  splash: Constants.expoConfig?.splash,
+  assets: Constants.manifest?.assets,
+});
+
 // スプラッシュ画面を自動で隠さないようにする
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync()
+  .then(() => {
+    console.log('Splash Screen: preventAutoHideAsync completed');
+  })
+  .catch(error => {
+    console.error('Splash Screen Error:', error);
+  });
 
 // アニメーションオプションを設定
 SplashScreen.setOptions({
@@ -45,7 +58,13 @@ export default function App() {
 
   const onLayoutRootView = useCallback(async () => {
     if (appIsReady) {
-      await SplashScreen.hideAsync();
+      try {
+        console.log('Attempting to hide splash screen...');
+        await SplashScreen.hideAsync();
+        console.log('Splash screen hidden successfully');
+      } catch (error) {
+        console.error('Error hiding splash screen:', error);
+      }
     }
   }, [appIsReady]);
 
