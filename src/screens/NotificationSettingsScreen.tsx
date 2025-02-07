@@ -1,16 +1,14 @@
 import React from 'react';
-import { StyleSheet, ScrollView, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NotificationSettings } from '../components/settings/NotificationSettings';
 
 export function NotificationSettingsScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView>
-        <View style={styles.content}>
-          <NotificationSettings />
-        </View>
-      </ScrollView>
+      <View style={styles.content}>
+        <NotificationSettings />
+      </View>
     </SafeAreaView>
   );
 }
@@ -18,9 +16,10 @@ export function NotificationSettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F8F9FA',
   },
   content: {
     flex: 1,
+    paddingHorizontal: 16,
   },
 });
