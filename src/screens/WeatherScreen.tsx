@@ -70,20 +70,19 @@ export function WeatherScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <Background />
-      <View style={[styles.content, { paddingTop: Platform.OS === 'android' ? insets.top : 0 }]}>
-        <View style={styles.header}>
-          <SafeAreaView />
-          <DateDisplay date={weatherData.createdAt.toDate()} />
-          <AreaDisplay areaName={weatherData.areaName} />
-          <WeatherMessage message={weatherData.message} />
-        </View>
-        <View style={styles.motherCharacterContainer}>
-          <MotherCharacter />
-        </View>
+  <View style={styles.container}>
+    <Background />
+    <View style={[styles.content, { paddingTop: insets.top + 20}]}>
+      <View style={styles.header}>
+        <DateDisplay date={weatherData.createdAt.toDate()} />
+        <AreaDisplay areaName={weatherData.areaName} />
+        <WeatherMessage message={weatherData.message} />
+      </View>
+      <View style={styles.motherCharacterContainer}>
+        <MotherCharacter />
       </View>
     </View>
+  </View>
   );
 }
 
