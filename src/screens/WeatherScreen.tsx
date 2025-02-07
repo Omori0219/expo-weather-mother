@@ -72,7 +72,7 @@ export function WeatherScreen() {
       <View style={[styles.content, { paddingTop: Platform.OS === 'android' ? insets.top : 0 }]}>
         <View style={styles.header}>
           <SafeAreaView />
-          <DateDisplay date={new Date(weatherData.date)} />
+          <DateDisplay date={weatherData.createdAt.toDate()} />
           <AreaDisplay areaName={weatherData.areaName} />
           <WeatherMessage message={weatherData.message} />
         </View>
