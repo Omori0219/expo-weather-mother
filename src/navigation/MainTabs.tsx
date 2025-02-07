@@ -24,6 +24,7 @@ const TAB_NAVIGATOR_SCREEN_OPTIONS: BottomTabNavigationOptions = {
     height: 100,
     backgroundColor: '#fff',
     borderTopWidth: 0,
+    paddingHorizontal: 24,
     ...Platform.select({
       ios: {},
       android: {
