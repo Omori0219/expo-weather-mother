@@ -13,6 +13,9 @@ import type { MainTabParamList } from '../types/navigation';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
+// アイコンサイズの共通値
+const ICON_SIZE = 24;
+
 // タブナビゲーターの共通設定
 const TAB_NAVIGATOR_SCREEN_OPTIONS: BottomTabNavigationOptions = {
   headerShown: false,
@@ -31,8 +34,12 @@ const TAB_NAVIGATOR_SCREEN_OPTIONS: BottomTabNavigationOptions = {
     paddingBottom: 8,
     paddingTop: 12,
   },
+  tabBarLabelStyle: {
+    marginTop: 4,
+    fontSize: 10,
+  },
   tabBarActiveTintColor: '#DE0613',
-  tabBarInactiveTintColor: '#999',
+  tabBarInactiveTintColor: '#333',
 };
 
 // 各画面の設定
@@ -42,8 +49,8 @@ const TAB_SCREENS = [
     component: WeatherScreen,
     options: {
       title: 'メイン',
-      tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-        <Ionicons name="sunny-outline" size={size} color={color} />
+      tabBarIcon: ({ color }: { color: string; size: number }) => (
+        <Ionicons name="sunny-outline" size={ICON_SIZE} color={color} />
       ),
     },
   },
@@ -52,8 +59,8 @@ const TAB_SCREENS = [
     component: () => <SetupScreen isInitialSetup={false} />,
     options: {
       title: '地域',
-      tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-        <Ionicons name="location-outline" size={size} color={color} />
+      tabBarIcon: ({ color }: { color: string; size: number }) => (
+        <Ionicons name="location-outline" size={ICON_SIZE} color={color} />
       ),
     },
   },
@@ -62,8 +69,8 @@ const TAB_SCREENS = [
     component: SettingsScreen,
     options: {
       title: '通知',
-      tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-        <Ionicons name="notifications-outline" size={size} color={color} />
+      tabBarIcon: ({ color }: { color: string; size: number }) => (
+        <Ionicons name="notifications-outline" size={ICON_SIZE} color={color} />
       ),
     },
   },
@@ -72,8 +79,8 @@ const TAB_SCREENS = [
     component: OthersScreen,
     options: {
       title: 'その他',
-      tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-        <Ionicons name="menu-outline" size={size} color={color} />
+      tabBarIcon: ({ color }: { color: string; size: number }) => (
+        <Ionicons name="menu-outline" size={ICON_SIZE} color={color} />
       ),
     },
   },
