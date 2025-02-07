@@ -7,7 +7,7 @@ import {
 import { WeatherScreen } from '../screens/WeatherScreen';
 import { SetupScreen } from '../screens/SetupScreen';
 import { NotificationSettingsScreen } from '../screens/NotificationSettingsScreen';
-import { OthersScreen } from '../screens/OthersScreen';
+import { OthersStack } from './OthersStack';
 import { Ionicons } from '@expo/vector-icons';
 import type { MainTabParamList } from '../types/navigation';
 
@@ -76,9 +76,10 @@ const TAB_SCREENS = [
   },
   {
     name: 'Others' as const,
-    component: OthersScreen,
+    component: OthersStack,
     options: {
       title: 'その他',
+      headerShown: false,
       tabBarIcon: ({ color }: { color: string; size: number }) => (
         <Ionicons name="menu-outline" size={ICON_SIZE} color={color} />
       ),
