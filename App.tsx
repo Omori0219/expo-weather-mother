@@ -25,6 +25,11 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
+        // デバッグ用のログ出力
+        console.log('Environment variables:', {
+          skipSetup: Constants.expoConfig?.extra?.skipSetup,
+          defaultArea: Constants.expoConfig?.extra?.defaultArea,
+        });
         // 必要な初期化処理をここに記述
         // 例: フォントのロード、初期データの取得など
         await new Promise(resolve => setTimeout(resolve, 2000));
