@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { collection, doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { WeatherDocument, WeatherData } from '../types/weather';
+import { WeatherTransformer } from '../services/weather';
 
 export function useWeather() {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,10 +30,12 @@ export function useWeather() {
       }
 
       const data = docSnap.data() as WeatherDocument;
+      const displayData = WeatherTransformer.toDisplayData(data);
 
       setWeatherData({
-        message: data.generatedMessage,
-        date: dateString,
+        message: WeatherTransformer.parseGeneratedMessage(data.generatedMessage).mother_message,
+        date: WeatherTransformer.formatDate(data.createdAt),
+        areaName: WeatherTransformer.getAreaName(data.areaCode),
       });
 
       return data;
