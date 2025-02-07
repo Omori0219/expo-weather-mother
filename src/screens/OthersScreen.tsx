@@ -9,8 +9,18 @@ export function OthersScreen() {
   const navigation = useNavigation<OthersStackNavigationProp>();
 
   const menuItems = [
-    { title: '利用規約', screen: 'Terms', icon: 'document-text-outline' },
-    { title: 'プライバシーポリシー', screen: 'PrivacyPolicy', icon: 'shield-checkmark-outline' },
+    {
+      title: '利用規約',
+      screen: 'Terms',
+      icon: 'document-text-outline',
+      description: 'アプリケーションの利用規約をご確認いただけます。',
+    },
+    {
+      title: 'プライバシーポリシー',
+      screen: 'PrivacyPolicy',
+      icon: 'shield-checkmark-outline',
+      description: '個人情報の取り扱いについてご確認いただけます。',
+    },
   ] as const;
 
   const handlePress = (screen: (typeof menuItems)[number]['screen']) => {
@@ -20,21 +30,23 @@ export function OthersScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.content}>
-        {menuItems.map((item, index) => (
+        <View style={styles.header}>
+          <Ionicons name="settings-outline" size={32} color="#DE0613" />
+          <Text style={styles.headerTitle}>その他の設定</Text>
+        </View>
+        {menuItems.map(item => (
           <Pressable
             key={item.screen}
-            style={({ pressed }) => [
-              styles.menuItem,
-              index === menuItems.length - 1 && styles.lastMenuItem,
-              pressed && styles.menuItemPressed,
-            ]}
+            style={({ pressed }) => [styles.menuItem, pressed && styles.menuItemPressed]}
             onPress={() => handlePress(item.screen)}
-            android_ripple={{ color: 'rgba(0, 0, 0, 0.1)' }}
           >
             <View style={styles.menuItemContent}>
-              <View style={styles.menuItemLeft}>
-                <Ionicons name={item.icon as any} size={24} color="#666" style={styles.menuIcon} />
-                <Text style={styles.menuText}>{item.title}</Text>
+              <View style={styles.menuItemIconContainer}>
+                <Ionicons name={item.icon as any} size={24} color="#DE0613" />
+              </View>
+              <View style={styles.menuItemTextContainer}>
+                <Text style={styles.menuItemTitle}>{item.title}</Text>
+                <Text style={styles.menuItemDescription}>{item.description}</Text>
               </View>
               <Ionicons name="chevron-forward" size={24} color="#999" />
             </View>
@@ -48,69 +60,66 @@ export function OthersScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    paddingVertical: 16,
-    backgroundColor: '#fff',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 1,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
+    backgroundColor: '#F8F9FA',
   },
   content: {
     flex: 1,
-    marginTop: 20,
+    paddingHorizontal: 16,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 24,
+    gap: 12,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1A1A1A',
   },
   menuItem: {
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    marginVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  menuItemPressed: {
+    opacity: 0.7,
   },
   menuItemContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    padding: 16,
   },
-  menuItemLeft: {
-    flexDirection: 'row',
+  menuItemIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFF5F5',
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-  menuIcon: {
     marginRight: 12,
   },
-  lastMenuItem: {
-    borderBottomWidth: 0,
+  menuItemTextContainer: {
+    flex: 1,
+    marginRight: 12,
   },
-  menuItemPressed: {
-    backgroundColor: Platform.select({
-      ios: '#f0f0f0',
-      android: '#fff',
-    }),
-  },
-  menuText: {
+  menuItemTitle: {
     fontSize: 16,
-    color: '#333',
-    ...Platform.select({
-      ios: {
-        fontWeight: '400',
-      },
-      android: {
-        fontFamily: 'sans-serif',
-      },
-    }),
+    fontWeight: '500',
+    color: '#1A1A1A',
+    marginBottom: 4,
+  },
+  menuItemDescription: {
+    fontSize: 13,
+    color: '#666666',
+    lineHeight: 18,
   },
 });
