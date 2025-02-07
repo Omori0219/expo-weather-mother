@@ -16,16 +16,16 @@ export function MainTabs() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          height: 80,
+          height: 100,
           backgroundColor: '#fff',
-          borderTopWidth: 1,
-          borderTopColor: '#e0e0e0',
+          borderTopWidth: 0,
+          // borderTopColor: '#e0e0e0',
           ...Platform.select({
             ios: {
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: -2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
+              // shadowColor: '#000',
+              // shadowOffset: { width: 0, height: -2 },
+              // shadowOpacity: 0.1,
+              // shadowRadius: 4,
             },
             android: {
               elevation: 8,
@@ -34,9 +34,9 @@ export function MainTabs() {
         },
         tabBarItemStyle: {
           paddingBottom: 8,
-          paddingTop: 8,
+          paddingTop: 12,
         },
-        tabBarActiveTintColor: '#007AFF',
+        tabBarActiveTintColor: '#DE0613',
         tabBarInactiveTintColor: '#999',
       }}
     >
