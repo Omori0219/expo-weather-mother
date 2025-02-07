@@ -3,7 +3,6 @@ import type { DrawerNavigationProp } from '@react-navigation/drawer';
 
 // Stack Navigation
 export type RootStackParamList = {
-  Splash: undefined;
   Setup: undefined;
   Main: undefined;
 };

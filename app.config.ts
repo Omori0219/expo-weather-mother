@@ -8,18 +8,25 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: 'portrait',
   icon: './assets/icon.png',
   userInterfaceStyle: 'light',
-  splash: {
-    image: './assets/splash.png',
-    resizeMode: 'contain',
-    backgroundColor: '#ffffff',
-  },
-  notification: {
-    icon: './assets/notification-icon.png',
-    color: '#ffffff',
-    iosDisplayInForeground: true,
-    androidMode: 'default',
-    androidCollapsedTitle: 'お天気おかん',
-  },
+  plugins: [
+    [
+      'expo-splash-screen',
+      {
+        image: './assets/logo.png',
+        backgroundColor: '#7EC8D4',
+        imageWidth: 200,
+      },
+    ],
+    [
+      'expo-notifications',
+      {
+        icon: './assets/notification-icon.png',
+        color: '#ffffff',
+        sounds: ['./assets/notification-sound.wav'],
+      },
+    ],
+    'expo-secure-store',
+  ],
   assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: true,
@@ -36,22 +43,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: './assets/adaptive-icon.png',
+      foregroundImage: './assets/icon.png',
       backgroundColor: '#ffffff',
     },
     package: 'jp.co.caen.weathermother',
   },
-  plugins: [
-    [
-      'expo-notifications',
-      {
-        icon: './assets/notification-icon.png',
-        color: '#ffffff',
-        sounds: ['./assets/notification-sound.wav'],
-      },
-    ],
-    'expo-secure-store',
-  ],
   extra: {
     firebaseApiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
     firebaseAuthDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,

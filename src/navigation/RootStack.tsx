@@ -1,5 +1,4 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { SplashScreen } from '../screens/SplashScreen';
 import { SetupScreen } from '../screens/SetupScreen';
 import { MainDrawer } from './MainDrawer';
 import type { RootStackParamList } from '../types/navigation';
@@ -12,8 +11,8 @@ export function RootStack() {
       screenOptions={{
         headerShown: false,
       }}
+      initialRouteName="Setup"
     >
-      <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Setup" children={() => <SetupScreen isInitialSetup={true} />} />
       <Stack.Screen name="Main" component={MainDrawer} />
     </Stack.Navigator>

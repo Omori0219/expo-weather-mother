@@ -1,7 +1,7 @@
 {
   "expo": {
-    "experiments": {
-      "newArchEnabled": true
-    }
+    "name": "お天気おかん",
+    "slug": "weather-mother",
+    "newArchEnabled": true
   }
 }
