@@ -19,7 +19,6 @@ export function OthersScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <Text style={styles.header}>その他</Text>
       <View style={styles.content}>
         {menuItems.map((item, index) => (
           <Pressable
