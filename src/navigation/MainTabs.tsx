@@ -6,8 +6,8 @@ import {
 } from '@react-navigation/bottom-tabs';
 import { WeatherScreen } from '../screens/WeatherScreen';
 import { SetupScreen } from '../screens/SetupScreen';
-import { SettingsScreen } from '../screens/SettingsScreen';
-import { OthersScreen } from '../screens/OthersScreen';
+import { NotificationSettingsScreen } from '../screens/NotificationSettingsScreen';
+import { OthersStack } from './OthersStack';
 import { Ionicons } from '@expo/vector-icons';
 import type { MainTabParamList } from '../types/navigation';
 
@@ -66,7 +66,7 @@ const TAB_SCREENS = [
   },
   {
     name: 'Settings' as const,
-    component: SettingsScreen,
+    component: NotificationSettingsScreen,
     options: {
       title: '通知',
       tabBarIcon: ({ color }: { color: string; size: number }) => (
@@ -76,9 +76,10 @@ const TAB_SCREENS = [
   },
   {
     name: 'Others' as const,
-    component: OthersScreen,
+    component: OthersStack,
     options: {
       title: 'その他',
+      headerShown: false,
       tabBarIcon: ({ color }: { color: string; size: number }) => (
         <Ionicons name="menu-outline" size={ICON_SIZE} color={color} />
       ),
