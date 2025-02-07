@@ -36,6 +36,7 @@ export function useWeather() {
         message: WeatherTransformer.parseGeneratedMessage(data.generatedMessage).mother_message,
         date: WeatherTransformer.formatDate(data.createdAt),
         areaName: WeatherTransformer.getAreaName(data.areaCode),
+        createdAt: data.createdAt,
       });
 
       return data;
