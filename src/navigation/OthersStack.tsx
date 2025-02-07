@@ -17,7 +17,7 @@ export function OthersStack() {
         name="OthersHome"
         component={OthersScreen}
         options={{
-          title: 'その他',
+          headerShown: false,
         }}
       />
       <Stack.Screen
