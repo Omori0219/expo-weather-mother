@@ -1,7 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 import { Image } from 'expo-image';
+import { memo } from 'react';
 
-export function MotherCharacter() {
+export const MotherCharacter = memo(() => {
   return (
     <View style={styles.container}>
       <Image
@@ -11,7 +12,7 @@ export function MotherCharacter() {
       />
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
