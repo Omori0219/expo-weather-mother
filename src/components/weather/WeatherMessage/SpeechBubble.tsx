@@ -1,5 +1,6 @@
 import { StyleSheet, View, Text, Image, useWindowDimensions } from 'react-native';
 import { COLORS, TYPOGRAPHY } from '../../../styles/weather/constants';
+import { useCustomFonts } from '../../../hooks/useCustomFonts';
 
 interface SpeechBubbleProps {
   message: string;
@@ -7,8 +8,14 @@ interface SpeechBubbleProps {
 
 export function SpeechBubble({ message }: SpeechBubbleProps) {
   const { width: screenWidth } = useWindowDimensions();
+  const { fontsLoaded, fonts } = useCustomFonts();
+
   const SPEECH_BUBBLE_ASPECT_RATIO = 1.2;
   const bubbleHeight = (screenWidth * 0.95) / SPEECH_BUBBLE_ASPECT_RATIO;
+
+  if (!fontsLoaded) {
+    return null; // フォントがロードされるまで何も表示しない
+  }
 
   return (
     <View style={styles.container}>
@@ -17,7 +24,7 @@ export function SpeechBubble({ message }: SpeechBubbleProps) {
         style={[styles.bubble, { height: bubbleHeight }]}
       />
       <View style={styles.messageContainer}>
-        <Text style={styles.message}>{message}</Text>
+        <Text style={[styles.message, { fontFamily: fonts.yujiSyuku }]}>{message}</Text>
       </View>
     </View>
   );
