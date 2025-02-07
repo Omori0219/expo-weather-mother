@@ -1,4 +1,5 @@
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Image } from 'expo-image';
 
 export function MotherCharacter() {
   return (
@@ -6,6 +7,7 @@ export function MotherCharacter() {
       <Image
         source={require('../../../assets/app/img-home-screen-mother.webp')}
         style={styles.image}
+        contentFit="contain"
       />
     </View>
   );
@@ -19,6 +21,5 @@ const styles = StyleSheet.create({
     width: '90%',
     height: undefined,
     aspectRatio: 1.075, // 実際の画像サイズ（W:402, H:374）に基づく比率
-    resizeMode: 'contain',
   },
 });
