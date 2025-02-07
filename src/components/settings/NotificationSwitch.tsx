@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { View, Switch, Text, StyleSheet, Alert, Linking } from 'react-native';
+import { View, Switch, Text, StyleSheet, Alert, Linking, ActivityIndicator } from 'react-native';
 import { useNotification } from '../../hooks/useNotification';
 
 export function NotificationSwitch() {
   const [isEnabled, setIsEnabled] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
   const { updateSettings, error, clearError } = useNotification();
 
   const toggleSwitch = async () => {
     try {
+      setIsUpdating(true);
       await updateSettings(!isEnabled);
       setIsEnabled(!isEnabled);
     } catch (error) {
@@ -25,19 +27,28 @@ export function NotificationSwitch() {
           },
         ]
       );
+    } finally {
+      setIsUpdating(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>プッシュ通知</Text>
-      <Switch
-        trackColor={{ false: '#767577', true: '#81b0ff' }}
-        thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-        ios_backgroundColor="#3e3e3e"
-        onValueChange={toggleSwitch}
-        value={isEnabled}
-      />
+      <View style={styles.switchContainer}>
+        <Text style={styles.label}>プッシュ通知</Text>
+        {isUpdating ? (
+          <ActivityIndicator size="small" color="#DE0613" style={styles.loader} />
+        ) : (
+          <Switch
+            trackColor={{ false: '#E0E0E0', true: '#FFC6C9' }}
+            thumbColor={isEnabled ? '#DE0613' : '#FFFFFF'}
+            ios_backgroundColor="#E0E0E0"
+            onValueChange={toggleSwitch}
+            value={isEnabled}
+            style={styles.switch}
+          />
+        )}
+      </View>
       {error && (
         <Text style={styles.errorText} onPress={clearError}>
           {error.message}
@@ -49,18 +60,29 @@ export function NotificationSwitch() {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: 'transparent',
+  },
+  switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
   },
   label: {
-    flex: 1,
     fontSize: 16,
+    color: '#1A1A1A',
+    fontWeight: '500',
+  },
+  switch: {
+    transform: [{ scale: 0.9 }],
+  },
+  loader: {
+    marginRight: 6,
   },
   errorText: {
-    color: 'red',
+    color: '#DE0613',
     fontSize: 12,
     marginTop: 4,
+    lineHeight: 16,
   },
 });
