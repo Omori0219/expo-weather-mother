@@ -6,7 +6,7 @@ import {
 } from '@react-navigation/bottom-tabs';
 import { WeatherScreen } from '../screens/WeatherScreen';
 import { SetupScreen } from '../screens/SetupScreen';
-import { SettingsScreen } from '../screens/SettingsScreen';
+import { NotificationSettingsScreen } from '../screens/NotificationSettingsScreen';
 import { OthersScreen } from '../screens/OthersScreen';
 import { Ionicons } from '@expo/vector-icons';
 import type { MainTabParamList } from '../types/navigation';
@@ -66,7 +66,7 @@ const TAB_SCREENS = [
   },
   {
     name: 'Settings' as const,
-    component: SettingsScreen,
+    component: NotificationSettingsScreen,
     options: {
       title: '通知',
       tabBarIcon: ({ color }: { color: string; size: number }) => (
