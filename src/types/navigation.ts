@@ -2,11 +2,15 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
 // Stack Navigation
+export type OthersStackParamList = {
+  OthersHome: undefined;
+  Terms: undefined;
+  PrivacyPolicy: undefined;
+};
+
 export type RootStackParamList = {
   Setup: undefined;
   Main: undefined;
-  Terms: undefined;
-  PrivacyPolicy: undefined;
 };
 
 export type RootStackNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -20,3 +24,4 @@ export type MainTabParamList = {
 };
 
 export type MainTabNavigationProp = BottomTabNavigationProp<MainTabParamList>;
+export type OthersStackNavigationProp = NativeStackNavigationProp<OthersStackParamList>;
