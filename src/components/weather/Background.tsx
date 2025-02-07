@@ -4,7 +4,7 @@ import { COLORS } from '../../styles/weather/constants';
 export function Background() {
   return (
     <View style={styles.container}>
-      <Image source={require('../../../assets/app/img-japan-map.png')} style={styles.map} />
+      <Image source={require('../../../assets/app/img-japan-map.webp')} style={styles.map} />
     </View>
   );
 }

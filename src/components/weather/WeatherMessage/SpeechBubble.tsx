@@ -20,7 +20,7 @@ export function SpeechBubble({ message }: SpeechBubbleProps) {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../../../assets/app/img-speech-bubble.png')}
+        source={require('../../../../assets/app/img-speech-bubble.webp')}
         style={[styles.bubble, { height: bubbleHeight }]}
       />
       <View style={styles.messageContainer}>
