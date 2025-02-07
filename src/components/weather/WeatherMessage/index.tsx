@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { SpeechBubble } from './SpeechBubble';
 
 interface WeatherMessageProps {
@@ -6,8 +6,11 @@ interface WeatherMessageProps {
 }
 
 export function WeatherMessage({ message }: WeatherMessageProps) {
+  const { width: screenWidth } = useWindowDimensions();
+  const containerWidth = screenWidth * 0.99; // 画面幅の95%
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { width: containerWidth }]}>
       <SpeechBubble message={message} />
     </View>
   );
@@ -15,6 +18,6 @@ export function WeatherMessage({ message }: WeatherMessageProps) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
+    alignSelf: 'center', // 中央寄せ
   },
 });
