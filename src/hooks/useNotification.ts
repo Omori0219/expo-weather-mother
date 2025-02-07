@@ -126,11 +126,36 @@ export function useNotification() {
     setError(null);
   }, []);
 
+  // 通知設定の更新
+  const updateSettings = useCallback(
+    async (isEnabled: boolean) => {
+      try {
+        if (!user?.uid) {
+          throw createError(
+            'ユーザーが見つかりません',
+            'user_not_found',
+            ERROR_DOMAINS.NOTIFICATION
+          );
+        }
+
+        await updateNotificationSettings(user.uid, {
+          isPushNotificationEnabled: isEnabled,
+          lastUpdated: new Date(),
+        });
+      } catch (error) {
+        const message = handleError(error, ERROR_DOMAINS.NOTIFICATION);
+        throw createError(message, 'settings_update_error', ERROR_DOMAINS.NOTIFICATION);
+      }
+    },
+    [user]
+  );
+
   return {
     expoPushToken,
     error,
     requestPermissions,
     getExpoPushToken,
     clearError,
+    updateSettings,
   };
 }
