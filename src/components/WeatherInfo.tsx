@@ -1,30 +1,18 @@
 import { StyleSheet, View, Text, ScrollView, RefreshControl } from 'react-native';
-import type { WeatherData } from '../types/weather';
-import { AREAS } from '../constants/areas';
+import type { WeatherDisplayData } from '../types/weather';
 
 interface WeatherInfoProps {
-  weatherData: WeatherData | null;
-  areaCode: string;
+  weatherDisplayData: WeatherDisplayData | null;
   onRefresh?: () => void;
   isRefreshing?: boolean;
 }
 
 export function WeatherInfo({
-  weatherData,
-  areaCode,
+  weatherDisplayData,
   onRefresh,
   isRefreshing = false,
 }: WeatherInfoProps) {
-  if (!weatherData) return null;
-
-  const area = AREAS.find(a => a.areaCode === areaCode);
-  const formattedDate = new Date(
-    weatherData.date.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')
-  ).toLocaleDateString('ja-JP', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  if (!weatherDisplayData) return null;
 
   return (
     <ScrollView
@@ -41,12 +29,12 @@ export function WeatherInfo({
       }
     >
       <View style={styles.header}>
-        <Text style={styles.areaName}>{area?.areaName || '不明な地域'}</Text>
-        <Text style={styles.date}>{formattedDate}</Text>
+        <Text style={styles.areaName}>{weatherDisplayData.areaName}</Text>
+        <Text style={styles.date}>{weatherDisplayData.displayDate}</Text>
       </View>
 
       <View style={styles.messageContainer}>
-        <Text style={styles.message}>{weatherData.message}</Text>
+        <Text style={styles.message}>{weatherDisplayData.motherMessage}</Text>
       </View>
     </ScrollView>
   );
