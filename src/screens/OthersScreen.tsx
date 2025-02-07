@@ -2,10 +2,10 @@ import React from 'react';
 import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import type { RootStackNavigationProp } from '../types/navigation';
+import type { OthersStackNavigationProp } from '../types/navigation';
 
 export function OthersScreen() {
-  const navigation = useNavigation<RootStackNavigationProp>();
+  const navigation = useNavigation<OthersStackNavigationProp>();
 
   const menuItems = [
     { title: '利用規約', screen: 'Terms' },
