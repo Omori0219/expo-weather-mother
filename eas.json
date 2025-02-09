@@ -13,6 +13,11 @@
     },
     "production": {
       "autoIncrement": true
+    },
+    "hackathon": {
+      "android": {
+        "buildType": "apk"
+      }
     }
   },
   "submit": {
