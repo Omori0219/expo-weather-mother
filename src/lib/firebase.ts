@@ -1,6 +1,13 @@
 import { initializeApp, getApp, getApps, type FirebaseOptions } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth, signInAnonymously, onAuthStateChanged, type User } from 'firebase/auth';
+import {
+  initializeAuth,
+  signInAnonymously,
+  onAuthStateChanged,
+  type User,
+  getReactNativePersistence,
+} from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import type { AppConfig } from '../types/env';
 
@@ -88,8 +95,10 @@ function getFirebaseApp() {
 // Firebaseアプリの初期化
 const app = getFirebaseApp();
 
-// Firebase Authの初期化
-export const auth = getAuth(app);
+// Firebase Authの初期化（永続化の設定を含む）
+export const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
+});
 
 // Firestoreの初期化
 export const db = getFirestore(app);
