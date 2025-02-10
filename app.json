@@ -4,6 +4,7 @@
     "slug": "weather-mother",
     "newArchEnabled": true,
     "version": "1.0.0",
+    "platforms": ["ios", "android", "web"],
     "android": {
       "package": "jp.co.caen.weathermother",
       "versionCode": 1,
@@ -11,6 +12,9 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#7EC8D4"
       }
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
     }
   }
 }
