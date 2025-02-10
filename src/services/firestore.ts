@@ -8,7 +8,7 @@ export async function fetchWeatherDocument(areaCode: string): Promise<WeatherDoc
   const docId = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}-${areaCode}`;
 
   try {
-    const docRef = doc(db, 'weather', docId);
+    const docRef = doc(db, 'weather_data', docId);
     const docSnap = await getDoc(docRef);
 
     if (!docSnap.exists()) {
