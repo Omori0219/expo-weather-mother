@@ -12,7 +12,7 @@ export const TYPOGRAPHY = {
   },
   AREA: {
     SIZE: 56,
-    LINE_HEIGHT: 56,
+    LINE_HEIGHT: 70,
     FONT_WEIGHT: 'bold',
   },
   MESSAGE: {

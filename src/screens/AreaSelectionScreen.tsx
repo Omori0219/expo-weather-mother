@@ -42,6 +42,8 @@ export function AreaSelectionScreen() {
       const success = await updateAreaAndWeather(selectedPrefecture);
       if (success) {
         navigation.goBack();
+      } else {
+        Alert.alert('エラー', '地域と天気情報の更新に失敗しました。もう一度お試しください。');
       }
     } catch (error) {
       const message = handleError(error, ERROR_DOMAINS.SETUP);

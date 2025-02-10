@@ -96,7 +96,7 @@ export function useWeatherManager() {
   const updateAreaAndWeather = useCallback(
     async (areaCode: string) => {
       try {
-        setState(prev => ({ ...prev, isLoading: true }));
+        setState(prev => ({ ...prev, isLoading: true, error: null }));
 
         // 地域コードを保存
         const success = await saveUserData(areaCode);
@@ -106,28 +106,28 @@ export function useWeatherManager() {
 
         // ユーザーデータを再取得
         await fetchUserData();
-
-        // 新しい地域の天気を取得
         const weatherDoc = await fetchWeather(areaCode);
 
-        if (weatherDoc) {
-          // WeatherDocumentからWeatherDataへ変換
-          const newData: WeatherData = {
-            message: WeatherTransformer.parseGeneratedMessage(weatherDoc.generatedMessage)
-              .mother_message,
-            date: WeatherTransformer.formatDate(weatherDoc.createdAt),
-            areaName: WeatherTransformer.getAreaName(weatherDoc.areaCode),
-            createdAt: weatherDoc.createdAt,
-          };
-
-          setState(prev => ({
-            ...prev,
-            data: newData,
-            lastUpdated: new Date(),
-            error: null,
-            isLoading: false,
-          }));
+        // 重要: weatherDocのnullチェックを追加
+        if (!weatherDoc) {
+          throw new Error('天気情報の取得に失敗しました');
         }
+
+        const newData: WeatherData = {
+          message: WeatherTransformer.parseGeneratedMessage(weatherDoc.generatedMessage)
+            .mother_message,
+          date: WeatherTransformer.formatDate(weatherDoc.createdAt),
+          areaName: WeatherTransformer.getAreaName(weatherDoc.areaCode),
+          createdAt: weatherDoc.createdAt,
+        };
+
+        setState(prev => ({
+          ...prev,
+          data: newData,
+          lastUpdated: new Date(),
+          error: null,
+          isLoading: false,
+        }));
 
         return true;
       } catch (error) {
