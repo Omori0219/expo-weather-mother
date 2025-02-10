@@ -39,3 +39,12 @@ yarn-error.*
 .env
 .env.*
 !.env.example
+
+
+.aab
+.apk
+.ipa
+.xcodeproj
+.xcodeworkspace
+.xcodebuild
+.xcodeworkspace
