@@ -1,5 +1,5 @@
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../lib/firebase';
 import { WeatherDocument } from '../types/weather';
 import { WeatherDataError } from './weather';
 

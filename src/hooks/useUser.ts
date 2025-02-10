@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 import type { User } from 'firebase/auth';
-import { db } from '../lib/firebase';
-import { firebaseAuth } from '../lib/firebase-auth';
+import { db, firebaseAuth } from '../lib/firebase';
 import type { UserDocument, UserData } from '../types/user';
 
 export function useUser() {
