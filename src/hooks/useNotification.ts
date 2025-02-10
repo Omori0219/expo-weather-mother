@@ -65,6 +65,7 @@ export function useNotification() {
       if (Platform.OS === 'ios') {
         if (existingStatus === 'undetermined') {
           const { status } = await Notifications.requestPermissionsAsync();
+          console.log('新しい通知許可状態:', status);
           return {
             status: status as NotificationPermissionState,
             canAskAgain: status === 'undetermined',
@@ -98,6 +99,7 @@ export function useNotification() {
   const getExpoPushToken = useCallback(async () => {
     try {
       const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+      console.log('Project ID:', projectId);
       if (!projectId) {
         throw createError(
           'Project ID が設定されていません',

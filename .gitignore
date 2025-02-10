@@ -48,3 +48,4 @@ yarn-error.*
 .xcodeworkspace
 .xcodebuild
 .xcodeworkspace
+.vercel
