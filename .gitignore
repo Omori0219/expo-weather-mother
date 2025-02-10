@@ -40,7 +40,6 @@ yarn-error.*
 .env.*
 !.env.example
 
-
 .aab
 .apk
 .ipa
@@ -48,4 +47,3 @@ yarn-error.*
 .xcodeworkspace
 .xcodebuild
 .xcodeworkspace
-.vercel
