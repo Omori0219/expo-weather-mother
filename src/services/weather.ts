@@ -15,9 +15,28 @@ export class WeatherDataError extends Error {
 export class WeatherTransformer {
   static parseGeneratedMessage(jsonString: string): GeneratedMessage {
     try {
-      const parsed = JSON.parse(jsonString);
+      // マークダウンの記法を除去してJSON文字列を抽出
+      const cleanJsonString = jsonString
+        // ```json や ``` で始まる場合、それを除去
+        .replace(/^```(?:json)?\s*/, '')
+        // 末尾の ``` を除去
+        .replace(/```$/, '')
+        // 前後の空白を除去
+        .trim();
+
+      // JSONとしてパース
+      const parsed = JSON.parse(cleanJsonString);
+
+      // 型の安全性チェック
+      if (!parsed || typeof parsed !== 'object' || !('mother_message' in parsed)) {
+        throw new Error('不正なメッセージ形式です');
+      }
+
       return parsed as GeneratedMessage;
     } catch (error) {
+      if (error instanceof Error) {
+        throw new WeatherDataError(`天気メッセージの解析に失敗しました: ${error.message}`, error);
+      }
       throw new WeatherDataError('天気メッセージの解析に失敗しました', error);
     }
   }
